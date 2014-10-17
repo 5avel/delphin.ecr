@@ -10,6 +10,7 @@ namespace Delphin
     [Guid("a0cc9128-46fc-4bf7-a2b8-76d1e81ae686"), ClassInterface(ClassInterfaceType.None), ComSourceInterfaces(typeof(IEvents))]
     public class ECR : IECR 
     {
+
         private TcpClient client = null;
         private NetworkStream tcpStream = null;
         private byte logNum = 0;
