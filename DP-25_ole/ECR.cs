@@ -189,7 +189,7 @@ namespace Delphin
         private string[] GetPluStrs()
         {
             string[] plu = new string[15];
-            byte[] b = new byte[50];
+            byte[] b = { }; // new byte[50];
             int j = 0;
             int p = 0;
             for(int i = 8; i < answerlenght-1; i++) // перебор массива ответа
@@ -204,8 +204,6 @@ namespace Delphin
                     j = 0; Array.Clear(b, 0, 50);
                 }
             }
-            _plu.Name = "test";
-
         return plu;
         }
     } // ECR
