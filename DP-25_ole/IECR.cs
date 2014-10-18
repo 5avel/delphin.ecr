@@ -13,7 +13,7 @@ namespace Delphin
         bool Connect(string ip, int port, byte logNum);
         bool Disconnect();
         bool Beep(string tone, string len);
-        string[] ReadPlu(string pluCode);
+        bool ReadPlu(string pluCode);
 
 
      //   bool WritePlu(int Row, int Code, string Name, double Price);

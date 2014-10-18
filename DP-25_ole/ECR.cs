@@ -165,7 +165,7 @@ namespace Delphin
             return Send(sendBytes);
         }
 
-        public string[] ReadPlu(string pluCode)
+        public bool ReadPlu(string pluCode)
         {
             //31h 30h 37h 09h 52h 09h  
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 82, 09 };
@@ -173,20 +173,12 @@ namespace Delphin
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
             if(Send(sendBytes))
             {
-                //GetPluStrs(answer);
-                Console.WriteLine(ASCIIEncoding.Default.GetString(answer,7,answerlenght));
-                var m = GetPluStrs();
-                foreach(var s in m)
-                {
-                    Console.WriteLine(s);
-                }
-
+               return GetPlu();
             }
-            string[] plu = { "qw" };
-            return plu;
+            return false;
         }
 
-        private string[] GetPluStrs()
+        private bool GetPlu()
         {
             string[] plu = new string[15];
             byte[] b = { }; // new byte[50];
@@ -201,10 +193,27 @@ namespace Delphin
                 else
                 {
                     plu[p++] = ASCIIEncoding.Default.GetString(b, 0, b.Length - 1);
-                    j = 0; Array.Clear(b, 0, 50);
+                    j = 0; Array.Clear(b, 0, b.Length - 1);
                 }
             }
-        return plu;
+            _plu.Code           = Convert.ToInt32(plu[0]);
+            _plu.TaxGr          = Convert.ToByte(plu[1]);
+            _plu.Dep            = Convert.ToByte(plu[2]);
+            _plu.Group          = Convert.ToByte(plu[3]);
+            _plu.PriceType      = Convert.ToByte(plu[4]);
+            _plu.Price          = Convert.ToDouble(plu[5]);
+            _plu.Turnover       = Convert.ToDouble(plu[6]);
+            _plu.SoldQty        = Convert.ToDouble(plu[7]);
+            _plu.StockQty       = Convert.ToDouble(plu[8]);
+            _plu.Bar1           = plu[9];
+            _plu.Bar2           = plu[10];
+            _plu.Bar3           = plu[11];
+            _plu.Bar4           = plu[12];
+            _plu.Name           = plu[13];
+            _plu.ConnectedPLU   = Convert.ToInt32(plu[14]);
+
+            return true;
         }
+
     } // ECR
 } // namespace DP_25_ole
