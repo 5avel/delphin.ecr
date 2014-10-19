@@ -8,16 +8,23 @@ using System.Linq;
 namespace Delphin
 {
     [Guid("a0cc9128-46fc-4bf7-a2b8-76d1e81ae686"), ClassInterface(ClassInterfaceType.None), ComSourceInterfaces(typeof(IEvents))]
-    public class ECR : IECR 
+    public class ECR : IECR
     {
 
+#region Private Field
         private TcpClient client = null;
         private NetworkStream tcpStream = null;
         private byte logNum = 0;
         private byte[] SEP = {9};
         private byte[] answer = new byte[256];
         private int answerlenght = 0;
-        public PLU _plu = new PLU();
+#endregion Private Field
+
+#region Public Field
+        public PLU plu = new PLU();
+#endregion Public Field
+
+#region Public methods
 
         public bool Connect(string ip, int port, byte logNum)
         {
@@ -155,21 +162,21 @@ namespace Delphin
             }
         }
 
-        public bool Beep(string tone, string len)
+        public bool Beep(int tone, int len)
         {
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 56, 48, 09 };
-            sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(tone)).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(tone.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
-            sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(len)).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(len.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             return Send(sendBytes);
         }
 
-        public bool ReadPlu(string pluCode)
-        {
-            //31h 30h 37h 09h 52h 09h  
+        public bool ReadPlu(int pluCode)
+        {                                                             // R
+                                                       //31h 30h 37h 09h 52h 09h  
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 82, 09 };
-            sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(pluCode)).ToArray(); // 31h
+            sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(pluCode.ToString())).ToArray(); // 31h
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
             if(Send(sendBytes))
             {
@@ -178,9 +185,27 @@ namespace Delphin
             return false;
         }
 
+        public bool DeletingPlu(int firstPlu, int lastPlu)
+        {                                                             // D
+                                                       //31h 30h 37h 09h 44h 09h  
+            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 68, 09 };
+            sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(firstPlu.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
+            sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(lastPlu.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
+            if (Send(sendBytes))
+            {
+                return GetPlu();
+            }
+            return false;
+        }
+#endregion Public methods
+
+#region Privat methods
+
         private bool GetPlu()
         {
-            string[] plu = new string[15];
+            string[] sPlu = new string[15];
             byte[] b = { }; // new byte[50];
             int j = 0;
             int p = 0;
@@ -192,28 +217,30 @@ namespace Delphin
                 }
                 else
                 {
-                    plu[p++] = ASCIIEncoding.Default.GetString(b, 0, b.Length - 1);
+                    sPlu[p++] = ASCIIEncoding.Default.GetString(b, 0, b.Length - 1);
                     j = 0; Array.Clear(b, 0, b.Length - 1);
                 }
             }
-            _plu.Code           = Convert.ToInt32(plu[0]);
-            _plu.TaxGr          = Convert.ToByte(plu[1]);
-            _plu.Dep            = Convert.ToByte(plu[2]);
-            _plu.Group          = Convert.ToByte(plu[3]);
-            _plu.PriceType      = Convert.ToByte(plu[4]);
-            _plu.Price          = Convert.ToDouble(plu[5]);
-            _plu.Turnover       = Convert.ToDouble(plu[6]);
-            _plu.SoldQty        = Convert.ToDouble(plu[7]);
-            _plu.StockQty       = Convert.ToDouble(plu[8]);
-            _plu.Bar1           = plu[9];
-            _plu.Bar2           = plu[10];
-            _plu.Bar3           = plu[11];
-            _plu.Bar4           = plu[12];
-            _plu.Name           = plu[13];
-            _plu.ConnectedPLU   = Convert.ToInt32(plu[14]);
+            plu.Code           = Convert.ToInt32(sPlu[0]);
+            plu.TaxGr          = Convert.ToByte(sPlu[1]);
+            plu.Dep            = Convert.ToByte(sPlu[2]);
+            plu.Group          = Convert.ToByte(sPlu[3]);
+            plu.PriceType      = Convert.ToByte(sPlu[4]);
+            plu.Price          = Convert.ToDouble(sPlu[5]);
+            plu.Turnover       = Convert.ToDouble(sPlu[6]);
+            plu.SoldQty        = Convert.ToDouble(sPlu[7]);
+            plu.StockQty       = Convert.ToDouble(sPlu[8]);
+            plu.Bar1           = sPlu[9];
+            plu.Bar2           = sPlu[10];
+            plu.Bar3           = sPlu[11];
+            plu.Bar4           = sPlu[12];
+            plu.Name           = sPlu[13];
+            plu.ConnectedPLU   = Convert.ToInt32(sPlu[14]);
 
             return true;
         }
 
-    } // ECR
+#endregion Privat methods
+
+    } // class ECR
 } // namespace DP_25_ole
