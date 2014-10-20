@@ -16,7 +16,7 @@ namespace Delphin
         bool ReadPlu(int pluCode);
         bool DeletingPlu(int firstPlu, int lastPlu);
 
-     //   bool WritePlu(int Row, int Code, string Name, double Price);
+        bool WritePlu(int Row, int Code, string Name, double Price);
        
 
 

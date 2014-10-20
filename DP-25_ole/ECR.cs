@@ -199,6 +199,19 @@ namespace Delphin
             }
             return false;
         }
+
+        public bool WritePlu(int Row, int Code, string Name, double Price)
+        {
+
+            return true;
+        }
+
+        public bool UpdatePlu(int Row, int Code, string Name, double Price)
+        {
+            
+            return true;
+        }
+
 #endregion Public methods
 
 #region Privat methods
