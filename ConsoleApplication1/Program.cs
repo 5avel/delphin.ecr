@@ -17,15 +17,18 @@ namespace ConsoleApplication1
             ecr.Beep(500, 100).ToString();
             ecr.Beep(1000, 100).ToString();
             ecr.Beep(500, 100).ToString();
-
-            ecr.ReadPlu(1);
-            //ecr._plu.Name = "ewe";
+            ecr.WritePlu(5, 1, 1, 1, 0, 6, 0, 20, "", "", "", "", "Батончик Twix MAX3", 0);
+            ecr.ReadPlu(3);
             Console.WriteLine(ecr.plu.Name);
+            //ecr.DeletingPlu(1);
+            //ecr.ReadPlu(1);
+            ////ecr._plu.Name = "ewe";
+            //Console.WriteLine(ecr.plu.Name);
 
 
             Console.WriteLine("DisConnect - " + ecr.Disconnect().ToString());
-            byte[] b = { 107 };
-            Console.WriteLine(Encoding.ASCII.GetString(b));
+           // byte[] b = { 45, 49, 50, 48, 48 };
+            //Console.WriteLine(Encoding.ASCII.GetString(b));
 
             //Console.WriteLine(BitConverter.ToString(Encoding.ASCII.GetBytes("R")));
 

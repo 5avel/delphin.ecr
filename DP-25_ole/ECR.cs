@@ -140,7 +140,7 @@ namespace Delphin
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 82, 09 };
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(pluCode.ToString())).ToArray(); // 31h
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
-            if(Send(sendBytes))
+            if(Send(sendBytes) && answerlenght > 8)
             {
                return GetPlu();
             }
@@ -157,7 +157,7 @@ namespace Delphin
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
             if (Send(sendBytes))
             {
-                return GetPlu();
+                return true;
             }
             return false;
         }
@@ -167,17 +167,106 @@ namespace Delphin
             return DeletingPlu(pluCode, pluCode);
         }
 
-        public bool WritePlu(int Row, int Code, string Name, double Price)
-        {
-
-            return true;
+        public bool WritePlu(   int plu, 
+                                byte taxGr,
+                                byte dep,
+                                byte group,
+                                byte priceType,
+                                double price,
+                                double addQty,
+                                double quantity,
+                                string bar1,
+                                string bar2,
+                                string bar3,
+                                string bar4,
+                                string name,
+                                int connectedPLU)
+        {                                                             // P
+                                                       //31h 30h 37h 09h 50h 09h  
+            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 80, 09 };
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(plu.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(taxGr.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dep.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(group.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(priceType.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(price.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            if (addQty < 0)
+            {
+                sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(addQty.ToString())).ToArray();
+            }
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(quantity.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(bar1.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(bar2.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(bar3.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(bar4.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray(); 
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(name.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            if (addQty < 0)
+            {
+                sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(connectedPLU.ToString())).ToArray();
+            }
+            sendBytes = sendBytes.Concat(SEP).ToArray(); 
+            if (Send(sendBytes))
+            {
+                return true;
+            }
+            return false;
         }
+
+        public bool WritePlu(   int plu,
+                                double price,
+                                string name,
+                                byte taxGr = 1,
+                                byte dep = 1,
+                                byte group = 1,
+                                byte priceType = 0,
+                                double addQty = 0,
+                                double quantity = 0,
+                                string bar1 = "",
+                                string bar2 = "",
+                                string bar3 = "",
+                                string bar4 = "",
+                                int connectedPLU = 0)
+        {
+            return WritePlu(plu, taxGr, dep, group, priceType, price, addQty, quantity, bar1, bar2, bar3, bar4, name, connectedPLU);
+        }
+
+        public bool WritePlu(int plu, byte taxGr, double price, double quantity, string bar1, string name, int connectedPLU)
+        {
+            return WritePlu(plu, taxGr, 1, 1, 0, price, 0, quantity, bar1, "", "", "", name, connectedPLU);
+        }
+
+        public bool WritePlu(int plu, byte taxGr, double price, string bar1, string name)
+        {
+            return WritePlu(plu, taxGr, price, 0, bar1, name , 0);
+        }
+
+        public bool WritePlu(int plu, byte taxGr, double price, string name)
+        {
+            return WritePlu(plu, taxGr, price, "", name);
+        }
+
+
 
         public bool UpdatePlu(int Row, int Code, string Name, double Price)
         {
             
             return true;
         }
+
+
 
 #endregion Public methods
 
@@ -224,7 +313,7 @@ namespace Delphin
         private bool GetPlu()
         {
             string[] sPlu = new string[15];
-            String temp = "";
+            String temp = String.Empty;
             int p = 0;
             for (int i = 8; i < answerlenght - 1; i++) // перебор массива ответа
             {
