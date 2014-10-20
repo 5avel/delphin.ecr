@@ -124,44 +124,6 @@ namespace Delphin
             }
         }
 
-        private bool Send(byte[] sendBytes)
-        {
-            if (client.Connected)
-            {
-                byte[] leng = { Convert.ToByte(sendBytes.Length) };
-                sendBytes = leng.Concat(sendBytes).ToArray();
-                tcpStream.Write(sendBytes, 0, sendBytes.Length);
-                byte[] bytes = new byte[client.ReceiveBufferSize];
-                int bytesRead = tcpStream.Read(bytes, 0, client.ReceiveBufferSize);
-                if (bytesRead > 0)
-                {
-                    if (bytes[6] == 80)
-                    {
-                       // answer = BitConverter.ToString(bytes, 0, bytesRead);
-                        answer = bytes;
-                        answerlenght = bytesRead;
-                        return true;
-                    }
-                    else if (bytes[6] == 70)
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-
         public bool Beep(int tone, int len)
         {
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 56, 48, 09 };
@@ -200,6 +162,11 @@ namespace Delphin
             return false;
         }
 
+        public bool DeletingPlu(int pluCode)
+        {                                                             
+            return DeletingPlu(pluCode, pluCode);
+        }
+
         public bool WritePlu(int Row, int Code, string Name, double Price)
         {
 
@@ -216,40 +183,76 @@ namespace Delphin
 
 #region Privat methods
 
-        private bool GetPlu()
+        private bool Send(byte[] sendBytes)
         {
-            string[] sPlu = new string[15];
-            byte[] b = { }; // new byte[50];
-            int j = 0;
-            int p = 0;
-            for(int i = 8; i < answerlenght-1; i++) // перебор массива ответа
+            if (client.Connected)
             {
-                if(answer[i] != 9)
+                byte[] leng = { Convert.ToByte(sendBytes.Length) };
+                sendBytes = leng.Concat(sendBytes).ToArray();
+                tcpStream.Write(sendBytes, 0, sendBytes.Length);
+                byte[] bytes = new byte[client.ReceiveBufferSize];
+                int bytesRead = tcpStream.Read(bytes, 0, client.ReceiveBufferSize);
+                if (bytesRead > 0)
                 {
-                    b[j++] = answer[i];
+                    if (bytes[6] == 80)
+                    {
+                        // answer = BitConverter.ToString(bytes, 0, bytesRead);
+                        answer = bytes;
+                        answerlenght = bytesRead;
+                        return true;
+                    }
+                    else if (bytes[6] == 70)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
                 else
                 {
-                    sPlu[p++] = ASCIIEncoding.Default.GetString(b, 0, b.Length - 1);
-                    j = 0; Array.Clear(b, 0, b.Length - 1);
+                    return false;
                 }
             }
-            plu.Code           = Convert.ToInt32(sPlu[0]);
-            plu.TaxGr          = Convert.ToByte(sPlu[1]);
-            plu.Dep            = Convert.ToByte(sPlu[2]);
-            plu.Group          = Convert.ToByte(sPlu[3]);
-            plu.PriceType      = Convert.ToByte(sPlu[4]);
-            plu.Price          = Convert.ToDouble(sPlu[5]);
-            plu.Turnover       = Convert.ToDouble(sPlu[6]);
-            plu.SoldQty        = Convert.ToDouble(sPlu[7]);
-            plu.StockQty       = Convert.ToDouble(sPlu[8]);
-            plu.Bar1           = sPlu[9];
-            plu.Bar2           = sPlu[10];
-            plu.Bar3           = sPlu[11];
-            plu.Bar4           = sPlu[12];
-            plu.Name           = sPlu[13];
-            plu.ConnectedPLU   = Convert.ToInt32(sPlu[14]);
+            else
+            {
+                return false;
+            }
+        }
 
+        private bool GetPlu()
+        {
+            string[] sPlu = new string[15];
+            String temp = "";
+            int p = 0;
+            for (int i = 8; i < answerlenght - 1; i++) // перебор массива ответа
+            {
+                if (answer[i] != 9) // не встретили сепаратор
+                {
+                    temp += ASCIIEncoding.Default.GetString(answer, i,1);
+                }
+                else // втретили сепаратор - значит конец строки. 
+                {
+                    sPlu[p++] = temp;
+                    temp = String.Empty;
+                }
+            }
+                plu.Code = Convert.ToInt32(sPlu[0]);
+                plu.TaxGr = Convert.ToByte(sPlu[1]);
+                plu.Dep = Convert.ToByte(sPlu[2]);
+                plu.Group = Convert.ToByte(sPlu[3]);
+                plu.PriceType = Convert.ToByte(sPlu[4]);
+                plu.Price = Convert.ToDouble(sPlu[5].Replace(".",","));
+                plu.Turnover = Convert.ToDouble(sPlu[6].Replace(".", ","));
+                plu.SoldQty = Convert.ToDouble(sPlu[7].Replace(".", ","));
+                plu.StockQty = Convert.ToDouble(sPlu[8].Replace(".", ","));
+                plu.Bar1 = sPlu[9];
+                plu.Bar2 = sPlu[10];
+                plu.Bar3 = sPlu[11];
+                plu.Bar4 = sPlu[12];
+                plu.Name = sPlu[13];
+                plu.ConnectedPLU = Convert.ToInt32(sPlu[14]);
             return true;
         }
 

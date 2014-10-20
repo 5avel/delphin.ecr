@@ -9,25 +9,25 @@ namespace ConsoleApplication1
     {
         static void Main(string[] args)
         {
-            //ECR ecr = new ECR();
-            //Console.WriteLine("Connect - " + ecr.Connect("192.168.1.2", 5999, 1).ToString());
+            ECR ecr = new ECR();
+            Console.WriteLine("Connect - " + ecr.Connect("192.168.1.2", 5999, 1).ToString());
 
 
-            //ecr.Beep("1000", "100").ToString();
-            //ecr.Beep("500", "100").ToString();
-            //ecr.Beep("1000", "100").ToString();
-            //ecr.Beep("500", "100").ToString();
+            ecr.Beep(1000, 100).ToString();
+            ecr.Beep(500, 100).ToString();
+            ecr.Beep(1000, 100).ToString();
+            ecr.Beep(500, 100).ToString();
 
-            //ecr.ReadPlu("1");
-            ////ecr._plu.Name = "ewe";
-            //Console.WriteLine(ecr.plu.Name);
+            ecr.ReadPlu(1);
+            //ecr._plu.Name = "ewe";
+            Console.WriteLine(ecr.plu.Name);
 
 
-            //Console.WriteLine("DisConnect - " + ecr.Disconnect().ToString());
-           // byte[] b = {107};
-           // Console.WriteLine(Encoding.ASCII.GetString(b));
+            Console.WriteLine("DisConnect - " + ecr.Disconnect().ToString());
+            byte[] b = { 107 };
+            Console.WriteLine(Encoding.ASCII.GetString(b));
 
-            Console.WriteLine(BitConverter.ToString(Encoding.ASCII.GetBytes("R")));
+            //Console.WriteLine(BitConverter.ToString(Encoding.ASCII.GetBytes("R")));
 
 
 
