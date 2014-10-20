@@ -17,8 +17,9 @@ namespace ConsoleApplication1
             ecr.Beep(500, 100).ToString();
             ecr.Beep(1000, 100).ToString();
             ecr.Beep(500, 100).ToString();
-            ecr.WritePlu(5, 1, 1, 1, 0, 6, 0, 20, "", "", "", "", "Батончик Twix MAX3", 0);
-            ecr.ReadPlu(3);
+            //ecr.WritePlu(5, 1, 1, 1, 0, 6, 0, 20, "", "", "", "", "Батончик Twix MAX3", 0);
+            ecr.WritePlu(7, 15.2, "Чашка сeпа");
+            ecr.ReadPlu(7);
             Console.WriteLine(ecr.plu.Name);
             //ecr.DeletingPlu(1);
             //ecr.ReadPlu(1);
