@@ -235,6 +235,34 @@ namespace Delphin
         {
             return WritePlu(plu, taxGr, price, "", name);
         }
+        /// <summary>
+        /// Check for mode connection with PC
+        /// </summary>
+        /// <returns></returns>
+        public bool CheckMode()
+        {                                                             // D
+                                                       //31h 30h 37h 09h 44h 09h  
+            byte[] sendBytes = { 05, 17, 00, logNum, 00, 45, 09 };
+
+            if (Send(sendBytes))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public bool GetDataTime()
+        {                                                             // D
+            //31h 30h 37h 09h 44h 09h  
+            byte[] sendBytes = { 05, 17, 00, logNum, 00, 54, 50, 09};
+
+            if (Send(sendBytes))
+            {
+                Console.WriteLine(Encoding.Default.GetString(answer, 7, 30));
+                return true;
+            }
+            return false;
+        }
 
 
 

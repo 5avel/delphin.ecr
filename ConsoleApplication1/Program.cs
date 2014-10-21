@@ -12,15 +12,16 @@ namespace ConsoleApplication1
             ECR ecr = new ECR();
             Console.WriteLine("Connect - " + ecr.Connect("in4.pp.ua", 5999, 1).ToString());
 
+            Console.WriteLine("GetDataTime " + ecr.GetDataTime().ToString());
             
-            ecr.Beep(1000, 100).ToString();
-            ecr.Beep(500, 100).ToString();
-            ecr.Beep(1000, 100).ToString();
-            ecr.Beep(500, 100).ToString();
+            //ecr.Beep(1000, 100).ToString();
+            //ecr.Beep(500, 100).ToString();
+            //ecr.Beep(1000, 100).ToString();
+            //ecr.Beep(500, 100).ToString();
 
-            Console.WriteLine("rename PLU   "+ ecr.WritePlu(15, 1, 1, 1, 0, 6, 0, 3.521, "", "", "", "", "Чай Ахмад5281", 0).ToString());
-            ecr.ReadPlu(15);
-            Console.WriteLine(ecr.plu.Code + "\t|  " + ecr.plu.TaxGr + "\t|  " + ecr.plu.StockQty + "\t|  " + ecr.plu.Price + "\t|  " + ecr.plu.Name);
+            //Console.WriteLine("rename PLU   "+ ecr.WritePlu(15, 1, 1, 1, 0, 6, 0, 3.521, "", "", "", "", "Чай Ахмат", 0).ToString());
+            //ecr.ReadPlu(15);
+            //Console.WriteLine(ecr.plu.Code + "\t|  " + ecr.plu.TaxGr + "\t|  " + ecr.plu.StockQty + "\t|  " + ecr.plu.Price + "\t|  " + ecr.plu.Name);
 
             //ecr.WritePlu(8, 3, 12.31, "Батончик Twix MAX");
             //ecr.ReadPlu(8);
