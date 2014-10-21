@@ -167,20 +167,8 @@ namespace Delphin
             return DeletingPlu(pluCode, pluCode);
         }
 
-        public bool WritePlu(   int plu, 
-                                byte taxGr,
-                                byte dep,
-                                byte group,
-                                byte priceType,
-                                double price,
-                                double addQty,
-                                double quantity,
-                                string bar1,
-                                string bar2,
-                                string bar3,
-                                string bar4,
-                                string name,
-                                int connectedPLU)
+        public bool WritePlu(   int plu, byte taxGr, byte dep, byte group, byte priceType, double price, double addQty,
+                                double quantity, string bar1, string bar2, string bar3, string bar4, string name, int connectedPLU)
         {                                                             // P
                                                        //31h 30h 37h 09h 50h 09h  
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 80, 09 };
@@ -194,14 +182,14 @@ namespace Delphin
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(priceType.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
-            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(price.ToString().Replace(".",","))).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(price.ToString().Replace(',','.'))).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             if (addQty < 0)
             {
-                sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(addQty.ToString().Replace(".", ","))).ToArray();
+                sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(addQty.ToString().Replace(',', '.'))).ToArray();
             }
             sendBytes = sendBytes.Concat(SEP).ToArray();
-            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(quantity.ToString().Replace(".", ","))).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(quantity.ToString().Replace(',', '.'))).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(bar1.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
@@ -226,36 +214,9 @@ namespace Delphin
         }
 
 
-
-        /* я
-         00000000  2D 05 11 00 01 00 31 30  37 09 50 09 37 09 31 09   -.....10 7.P.7.1. 
-         00000010  31 09 31 09 30 09 31 35  2C 32 09 09 30 09 09 09   1.1.0.15 ,2..0... 
-         00000020  09 09 D7 E0 F8 EA E0 20  F1 65 EF E0 09 09         .......  .e....
-         */
-
-        /*
-         00000000  33 05 11 00 01 00 31 30  37 09 50 09 31 30 09 31   3.....10 7.P.10.1 
-         00000010  09 31 09 31 09 30 09 36  2E 32 09 09 35 30 09 09   .1.1.0.6 .2..50.. 
-         00000020  09 09 09 3F 3F 3F 3F 3F  3F 3F 3F 20 54 77 69 78   ...????? ??? Twix 
-         00000030  31 38 09 09                                        18..
-         */
-
-
-
-        public bool WritePlu(   int plu,
-                                double price,
-                                string name,
-                                byte taxGr = 1,
-                                byte dep = 1,
-                                byte group = 1,
-                                byte priceType = 0,
-                                double addQty = 0,
-                                double quantity = 0,
-                                string bar1 = "",
-                                string bar2 = "",
-                                string bar3 = "",
-                                string bar4 = "",
-                                int connectedPLU = 0)
+        public bool WritePlu(   int plu, double price, string name, byte taxGr = 1,  byte dep = 1,
+                                byte group = 1,  byte priceType = 0, double addQty = 0, double quantity = 0,
+                                string bar1 = "", string bar2 = "", string bar3 = "", string bar4 = "", int connectedPLU = 0)
         {
             return WritePlu(plu, taxGr, dep, group, priceType, price, addQty, quantity, bar1, bar2, bar3, bar4, name, connectedPLU);
         }
@@ -275,13 +236,6 @@ namespace Delphin
             return WritePlu(plu, taxGr, price, "", name);
         }
 
-
-
-        public bool UpdatePlu(int Row, int Code, string Name, double Price)
-        {
-            
-            return true;
-        }
 
 
 

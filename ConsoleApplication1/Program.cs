@@ -10,17 +10,31 @@ namespace ConsoleApplication1
         static void Main(string[] args)
         {
             ECR ecr = new ECR();
-            Console.WriteLine("Connect - " + ecr.Connect("192.168.1.2", 5999, 1).ToString());
+            Console.WriteLine("Connect - " + ecr.Connect("in4.pp.ua", 5999, 1).ToString());
 
-
+            
             ecr.Beep(1000, 100).ToString();
             ecr.Beep(500, 100).ToString();
             ecr.Beep(1000, 100).ToString();
             ecr.Beep(500, 100).ToString();
-            //ecr.WritePlu(5, 1, 1, 1, 0, 6, 0, 20, "", "", "", "", "Батончик Twix MAX3", 0);
-            ecr.WritePlu(7, 15.2, "Чашка сeпа");
-            ecr.ReadPlu(7);
-            Console.WriteLine(ecr.plu.Name);
+
+            Console.WriteLine("rename PLU   "+ ecr.WritePlu(15, 1, 1, 1, 0, 6, 0, 3.521, "", "", "", "", "Чай Ахмад5281", 0).ToString());
+            ecr.ReadPlu(15);
+            Console.WriteLine(ecr.plu.Code + "\t|  " + ecr.plu.TaxGr + "\t|  " + ecr.plu.StockQty + "\t|  " + ecr.plu.Price + "\t|  " + ecr.plu.Name);
+
+            //ecr.WritePlu(8, 3, 12.31, "Батончик Twix MAX");
+            //ecr.ReadPlu(8);
+            //Console.WriteLine(ecr.plu.Code + "\t|  " + ecr.plu.TaxGr + "\t|  " + ecr.plu.StockQty + "\t|  " + ecr.plu.Price + "\t|  " + ecr.plu.Name);
+
+            // ecr.WritePlu(9, 2, 12.39, "Батончик Twix MAX2");
+            //ecr.ReadPlu(9);
+            //Console.WriteLine(ecr.plu.Code + "\t|  " + ecr.plu.TaxGr + "\t|  " + ecr.plu.StockQty + "\t|  " + ecr.plu.Price + "\t|  " + ecr.plu.Name);
+            
+
+            //ecr.WritePlu(18, 15.29, "Чашка сeпа223");
+            //ecr.ReadPlu(18);
+            //Console.WriteLine(ecr.plu.Name);
+            //ecr.DeletingPlu(1, 50);
             //ecr.DeletingPlu(1);
             //ecr.ReadPlu(1);
             ////ecr._plu.Name = "ewe";
@@ -28,7 +42,7 @@ namespace ConsoleApplication1
 
 
             Console.WriteLine("DisConnect - " + ecr.Disconnect().ToString());
-           // byte[] b = { 45, 49, 50, 48, 48 };
+            //byte[] b = { 49,  53, 44, 50 };
             //Console.WriteLine(Encoding.ASCII.GetString(b));
 
             //Console.WriteLine(BitConverter.ToString(Encoding.ASCII.GetBytes("R")));
