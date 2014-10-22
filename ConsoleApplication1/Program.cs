@@ -13,6 +13,7 @@ namespace ConsoleApplication1
             Console.WriteLine("Connect - " + ecr.Connect("in4.pp.ua", 5999, 1).ToString());
 
             Console.WriteLine("GetDataTime " + ecr.GetDataTime().ToString());
+            Console.WriteLine("CheckMode " + ecr.CheckMode().ToString());
             
             //ecr.Beep(1000, 100).ToString();
             //ecr.Beep(500, 100).ToString();

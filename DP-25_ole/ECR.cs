@@ -235,6 +235,7 @@ namespace Delphin
         {
             return WritePlu(plu, taxGr, price, "", name);
         }
+
         /// <summary>
         /// Check for mode connection with PC
         /// </summary>
@@ -343,6 +344,25 @@ namespace Delphin
                 plu.ConnectedPLU = Convert.ToInt32(sPlu[14]);
             return true;
         }
+
+
+        /*
+         Command: 90 (5Ah)
+
+            Diagnostic information
+
+            This is example command syntax: Sintax 1:
+
+            {Param}<SEP>
+            Optional parameters:
+
+            none - Diagnostic information without firmware checksum;
+            Answer(1)
+            1 - Diagnostic information with firmware checksum;
+            Answer(1)
+            # - Device identification;
+            Answer(2)
+         */
 
 #endregion Privat methods
 
