@@ -265,6 +265,27 @@ namespace Delphin
             return false;
         }
 
+        public bool GetEJ()
+        {
+            
+            // 124|17-10-14 00:00:01 DST|20-10-14 00:00:01 DST|
+            /* HHHHHHHHHHH
+             31-32-34-7C-31-37-2D-31-30-2D-31-34-20-30-30-3A-30-30-3A-30-31-20-44-53-54-7C-32
+            -30-2D-31-30-2D-31-34-20-30-30-3A-30-30-3A-30-31-20-44-53-54-7C
+             */
+
+            // 124
+                                                       //31h 32h 34h 09h  
+            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 52, 09, 09, 09 };
+
+            if (Send(sendBytes))
+            {
+                Console.WriteLine(Encoding.Default.GetString(answer, 7, 50));
+                return true;
+            }
+            return false;
+        }
+
 
 
 

@@ -13,7 +13,7 @@ namespace ConsoleApplication1
             Console.WriteLine("Connect - " + ecr.Connect("in4.pp.ua", 5999, 1).ToString());
 
             Console.WriteLine("GetDataTime " + ecr.GetDataTime().ToString());
-            Console.WriteLine("CheckMode " + ecr.CheckMode().ToString());
+            Console.WriteLine("GetEJ " + ecr.GetEJ().ToString());
             
             //ecr.Beep(1000, 100).ToString();
             //ecr.Beep(500, 100).ToString();
@@ -47,7 +47,7 @@ namespace ConsoleApplication1
             //byte[] b = { 49,  53, 44, 50 };
             //Console.WriteLine(Encoding.ASCII.GetString(b));
 
-            //Console.WriteLine(BitConverter.ToString(Encoding.ASCII.GetBytes("R")));
+            Console.WriteLine(BitConverter.ToString(Encoding.ASCII.GetBytes("124|17-10-14 00:00:01 DST|20-10-14 00:00:01 DST|")));
 
 
 
