@@ -44,10 +44,10 @@ namespace ConsoleApplication1
 
 
             Console.WriteLine("DisConnect - " + ecr.Disconnect().ToString());
-            //byte[] b = { 49,  53, 44, 50 };
+            //byte[] b = { };
             //Console.WriteLine(Encoding.ASCII.GetString(b));
 
-            Console.WriteLine(BitConverter.ToString(Encoding.ASCII.GetBytes("124|17-10-14 00:00:01 DST|20-10-14 00:00:01 DST|")));
+            Console.WriteLine(BitConverter.ToString(Encoding.Default.GetBytes("124|17-10-14 00:00:01 DST|20-10-14 00:00:01 DST|")));
 
 
 
