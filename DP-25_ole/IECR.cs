@@ -19,8 +19,8 @@ namespace Delphin
         bool WritePlu(int plu, byte taxGr, byte dep, byte group, byte priceType, double price, double addQty, double quantity,
                                 string bar1, string bar2, string bar3, string bar4, string name, int connectedPLU);
 
-        bool GetDataTime();
-       // bool SetDataTime();
+        string GetDataTime();
+        bool SetDataTime(string dataTime);
         
 
 

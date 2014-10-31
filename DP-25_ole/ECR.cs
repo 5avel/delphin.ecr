@@ -145,7 +145,7 @@ namespace Delphin
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
             if(Send(sendBytes) && answerlenght > 8)
             {
-               return GetPlu();
+               return SetPlu();
             }
             return false;
         }
@@ -288,28 +288,37 @@ namespace Delphin
         }
 
         /// <summary>
-        /// 
+        /// Получает диапозон документов пробитых в заданном промежутке времени.
         /// </summary>
-        /// <param name="startData">DD-MM-YY</param>
-        /// <param name="endDate">DD-MM-YY</param>
+        /// <param name="startData">>DD-MM-YY HH:MM:ss< Если пусто, то значение устанавливается как дата фискализации</param>
+        /// <param name="endDate">>DD-MM-YY HH:MM:ss< Если пусто, то значение устанавливается как дата последнего фискального документа</param>
         /// <returns></returns>
-        public bool GetEJ(string startData, string endDate)
+        public bool GetDocNumberByDataTime(string startData, string endDate)
         {
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 52, 09,};
-            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(startData + " 00:00:01 DST")).ToArray();
+            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 52, 09};
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(startData + " DST")).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
-            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(endDate + " 00:00:01 DST")).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(endDate + " DST")).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
-
-            Console.WriteLine(BitConverter.ToString(sendBytes));
-            Console.WriteLine(Encoding.Default.GetString(sendBytes));
 
             if (Send(sendBytes))
             {
-                Console.WriteLine(Encoding.Default.GetString(answer, 7, 50));
+                Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
+                Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
                 return true;
             }
             return false;
+        }
+
+         /// <summary>
+        /// Получает диапозон документов пробитых в заданном промежутке времени.
+        /// </summary>
+        /// <param name="startData">>DD-MM-YY< Дата с включительно. Если пусто, то значение устанавливается как дата фискализации</param>
+        /// <param name="endDate">>DD-MM-YY< Дата по включительно. Если пусто, то значение устанавливается как дата последнего фискального документа</param>
+        /// <returns></returns>
+        public bool GetDocNumberByData(string startData, string endDate)
+        {
+            return GetDocNumberByDataTime(startData + " 00:00:00", endDate+" 23:59:59");
         }
 
 
@@ -357,7 +366,11 @@ namespace Delphin
             }
         }
 
-        private bool GetPlu()
+        /// <summary>
+        /// Преабразует массив byte находящийся в переменной ansfer - массив строк
+        /// </summary>
+        /// <returns>Массив строк.</returns>
+        private string[] Separating()
         {
             string[] sPlu = new string[15];
             String temp = String.Empty;
@@ -366,7 +379,7 @@ namespace Delphin
             {
                 if (answer[i] != 9) // не встретили сепаратор
                 {
-                    temp += ASCIIEncoding.Default.GetString(answer, i,1);
+                    temp += ASCIIEncoding.Default.GetString(answer, i, 1);
                 }
                 else // втретили сепаратор - значит конец строки. 
                 {
@@ -374,42 +387,38 @@ namespace Delphin
                     temp = String.Empty;
                 }
             }
-                plu.Code = Convert.ToInt32(sPlu[0]);
-                plu.TaxGr = Convert.ToByte(sPlu[1]);
-                plu.Dep = Convert.ToByte(sPlu[2]);
-                plu.Group = Convert.ToByte(sPlu[3]);
-                plu.PriceType = Convert.ToByte(sPlu[4]);
-                plu.Price = Convert.ToDouble(sPlu[5].Replace(".",","));
-                plu.Turnover = Convert.ToDouble(sPlu[6].Replace(".", ","));
-                plu.SoldQty = Convert.ToDouble(sPlu[7].Replace(".", ","));
-                plu.StockQty = Convert.ToDouble(sPlu[8].Replace(".", ","));
-                plu.Bar1 = sPlu[9];
-                plu.Bar2 = sPlu[10];
-                plu.Bar3 = sPlu[11];
-                plu.Bar4 = sPlu[12];
-                plu.Name = sPlu[13];
-                plu.ConnectedPLU = Convert.ToInt32(sPlu[14]);
+            return sPlu;
+        }
+
+        /// <summary>
+        /// Заполняет объект класса PLU из массива строк.
+        /// </summary>
+        /// <returns></returns>
+        private bool SetPlu()
+        {
+            string[] sPlu = Separating();
+
+            plu.Code = Convert.ToInt32(sPlu[0]);
+            plu.TaxGr = Convert.ToByte(sPlu[1]);
+            plu.Dep = Convert.ToByte(sPlu[2]);
+            plu.Group = Convert.ToByte(sPlu[3]);
+            plu.PriceType = Convert.ToByte(sPlu[4]);
+            plu.Price = Convert.ToDouble(sPlu[5].Replace(".",","));
+            plu.Turnover = Convert.ToDouble(sPlu[6].Replace(".", ","));
+            plu.SoldQty = Convert.ToDouble(sPlu[7].Replace(".", ","));
+            plu.StockQty = Convert.ToDouble(sPlu[8].Replace(".", ","));
+            plu.Bar1 = sPlu[9];
+            plu.Bar2 = sPlu[10];
+            plu.Bar3 = sPlu[11];
+            plu.Bar4 = sPlu[12];
+            plu.Name = sPlu[13];
+            plu.ConnectedPLU = Convert.ToInt32(sPlu[14]);
+
             return true;
         }
 
 
-        /*
-         Command: 90 (5Ah)
 
-            Diagnostic information
-
-            This is example command syntax: Sintax 1:
-
-            {Param}<SEP>
-            Optional parameters:
-
-            none - Diagnostic information without firmware checksum;
-            Answer(1)
-            1 - Diagnostic information with firmware checksum;
-            Answer(1)
-            # - Device identification;
-            Answer(2)
-         */
 
 #endregion Privat methods
 
