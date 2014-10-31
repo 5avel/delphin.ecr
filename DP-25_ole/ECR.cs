@@ -240,7 +240,7 @@ namespace Delphin
         }
 
         /// <summary>
-        /// Check for mode connection with PC
+        /// Check for mode connection with PC Проверить на COM порту.
         /// </summary>
         /// <returns></returns>
         public bool CheckMode()
@@ -255,14 +255,33 @@ namespace Delphin
             return false;
         }
 
-        public bool GetDataTime()
+        public string GetDataTime()
         {                                                             // D
             //31h 30h 37h 09h 44h 09h  
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 54, 50, 09};
 
             if (Send(sendBytes))
             {
-                Console.WriteLine(Encoding.Default.GetString(answer, 7, 30));
+
+                return Encoding.Default.GetString(answer, 7, 30);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dstsTime">DateTime - Date and time in format: DD-MM-YY<SPACE>hh:mm:ss<SPACE>DST</param>
+        /// <returns></returns>
+        public bool SetDataTime(string dataTime)
+        {                                                             // D
+            //31h 30h 37h 09h 44h 09h  
+            byte[] sendBytes = { 05, 17, 00, logNum, 00, 54, 49, 09 };
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dataTime)).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+
+            if (Send(sendBytes))
+            {
                 return true;
             }
             return false;
