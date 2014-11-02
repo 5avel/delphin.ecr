@@ -145,7 +145,23 @@ namespace Delphin
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
             if(Send(sendBytes) && answerlenght > 8)
             {
-               return SetPlu();
+                List<string> lPlu = Separating();
+                plu.Code = Convert.ToInt32(lPlu[0]);
+                plu.TaxGr = Convert.ToByte(lPlu[1]);
+                plu.Dep = Convert.ToByte(lPlu[2]);
+                plu.Group = Convert.ToByte(lPlu[3]);
+                plu.PriceType = Convert.ToByte(lPlu[4]);
+                plu.Price = Convert.ToDouble(lPlu[5].Replace(".", ","));
+                plu.Turnover = Convert.ToDouble(lPlu[6].Replace(".", ","));
+                plu.SoldQty = Convert.ToDouble(lPlu[7].Replace(".", ","));
+                plu.StockQty = Convert.ToDouble(lPlu[8].Replace(".", ","));
+                plu.Bar1 = lPlu[9];
+                plu.Bar2 = lPlu[10];
+                plu.Bar3 = lPlu[11];
+                plu.Bar4 = lPlu[12];
+                plu.Name = lPlu[13];
+                plu.ConnectedPLU = Convert.ToInt32(lPlu[14]);
+               return true;
             }
             return false;
         }
@@ -393,37 +409,23 @@ namespace Delphin
             }
             return lPlu;
         }
-
         /// <summary>
-        /// Заполняет объект класса PLU из массива строк.
+        /// задает документ для чтения
         /// </summary>
+        /// <param name="docNumber"></param>
         /// <returns></returns>
-        private bool SetPlu()
-        {
-            List<string> lPlu = Separating();
+        public bool SetDocForRead(int docNumber)
+        {// 125 | 1 | docNum
+            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 48, 09};
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            if (Send(sendBytes))
+            {
+                Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
+                return true;
+            }
 
-            plu.Code = Convert.ToInt32(lPlu[0]);
-            plu.TaxGr = Convert.ToByte(lPlu[1]);
-            plu.Dep = Convert.ToByte(lPlu[2]);
-            plu.Group = Convert.ToByte(lPlu[3]);
-            plu.PriceType = Convert.ToByte(lPlu[4]);
-            plu.Price = Convert.ToDouble(lPlu[5].Replace(".",","));
-            plu.Turnover = Convert.ToDouble(lPlu[6].Replace(".", ","));
-            plu.SoldQty = Convert.ToDouble(lPlu[7].Replace(".", ","));
-            plu.StockQty = Convert.ToDouble(lPlu[8].Replace(".", ","));
-            plu.Bar1 = lPlu[9];
-            plu.Bar2 = lPlu[10];
-            plu.Bar3 = lPlu[11];
-            plu.Bar4 = lPlu[12];
-            plu.Name = lPlu[13];
-            plu.ConnectedPLU = Convert.ToInt32(lPlu[14]);
-
-            return true;
-        }
-
-        private bool SetDocForRead(int docNumber)
-        {
-
+            Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
             return false;
         }
 
