@@ -12,8 +12,24 @@ namespace ConsoleApplication1
             ECR ecr = new ECR();
             Console.WriteLine("Connect - " + ecr.Connect("in4.pp.ua", 5999, 1).ToString());
 
-            //Console.WriteLine("GetDataTime " + ecr.GetDataTime().ToString());
+            //Console.WriteLine("GetDataTime " + ecr.GetDataTime().ToString()); 11 22 26 49
+            Console.WriteLine("GetEJ " + ecr.GetDocNumberByData("15-10-14", "15-10-14").ToString());
+            Console.WriteLine("GetEJ " + ecr.GetDocNumberByData("16-10-14", "16-10-14").ToString());
+            Console.WriteLine("GetEJ " + ecr.GetDocNumberByData("17-10-14", "17-10-14").ToString());
+            Console.WriteLine("GetEJ " + ecr.GetDocNumberByData("18-10-14", "18-10-14").ToString());
+            Console.WriteLine("GetEJ " + ecr.GetDocNumberByData("19-10-14", "19-10-14").ToString());
+            Console.WriteLine("GetEJ " + ecr.GetDocNumberByData("20-10-14", "20-10-14").ToString());
             Console.WriteLine("GetEJ " + ecr.GetDocNumberByData("21-10-14", "21-10-14").ToString());
+            Console.WriteLine("GetEJ " + ecr.GetDocNumberByData("22-10-14", "22-10-14").ToString());
+            Console.WriteLine("GetEJ " + ecr.GetDocNumberByData("23-10-14", "23-10-14").ToString());
+            Console.WriteLine("GetEJ " + ecr.GetDocNumberByData("24-10-14", "24-10-14").ToString());
+            Console.WriteLine("GetEJ " + ecr.GetDocNumberByData("25-10-14", "25-10-14").ToString());
+            Console.WriteLine("GetEJ " + ecr.GetDocNumberByData("26-10-14", "26-10-14").ToString());
+            Console.WriteLine("GetEJ " + ecr.GetDocNumberByData("27-10-14", "27-10-14").ToString());
+            Console.WriteLine("GetEJ " + ecr.GetDocNumberByData("28-10-14", "28-10-14").ToString());
+            Console.WriteLine("GetEJ " + ecr.GetDocNumberByData("29-10-14", "29-10-14").ToString());
+            Console.WriteLine("GetEJ " + ecr.GetDocNumberByData("30-10-14", "30-10-14").ToString());
+            Console.WriteLine("GetEJ " + ecr.GetDocNumberByData("31-10-14", "31-10-14").ToString());
             
             //ecr.Beep(1000, 100).ToString();
             //ecr.Beep(500, 100).ToString();

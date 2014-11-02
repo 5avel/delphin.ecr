@@ -19,7 +19,7 @@ namespace Delphin
         private byte[] answer = new byte[256];
         private int answerlenght = 0;
 
-        private int eJfirstDoc = 0, eJlastDoc = 0; // поля заполняются методом GetEJ(ДатаС, ДатаПО), если вернул true.
+        private int eJfirstDoc = 0, eJlastDoc = 0; // поля заполняются методом GetDocNumber(ДатаС, ДатаПО), если вернул true.
  
 #endregion Private Field
 
@@ -303,7 +303,7 @@ namespace Delphin
 
             if (Send(sendBytes))
             {
-                Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
+                //Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
                 Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
                 return true;
             }
@@ -319,6 +319,11 @@ namespace Delphin
         public bool GetDocNumberByData(string startData, string endDate)
         {
             return GetDocNumberByDataTime(startData + " 00:00:00", endDate+" 23:59:59");
+        }
+
+        public bool ReadDoc()
+        {
+            return true;
         }
 
 
@@ -370,11 +375,10 @@ namespace Delphin
         /// Преабразует массив byte находящийся в переменной ansfer - массив строк
         /// </summary>
         /// <returns>Массив строк.</returns>
-        private string[] Separating()
+        private List<string> Separating()
         {
-            string[] sPlu = new string[15];
+            List<string> lPlu = new List<string>();
             String temp = String.Empty;
-            int p = 0;
             for (int i = 8; i < answerlenght - 1; i++) // перебор массива ответа
             {
                 if (answer[i] != 9) // не встретили сепаратор
@@ -383,11 +387,11 @@ namespace Delphin
                 }
                 else // втретили сепаратор - значит конец строки. 
                 {
-                    sPlu[p++] = temp;
-                    temp = String.Empty;
+                    lPlu.Add(temp);
+                    temp = String.Empty;      
                 }
             }
-            return sPlu;
+            return lPlu;
         }
 
         /// <summary>
@@ -396,28 +400,34 @@ namespace Delphin
         /// <returns></returns>
         private bool SetPlu()
         {
-            string[] sPlu = Separating();
+            List<string> lPlu = Separating();
 
-            plu.Code = Convert.ToInt32(sPlu[0]);
-            plu.TaxGr = Convert.ToByte(sPlu[1]);
-            plu.Dep = Convert.ToByte(sPlu[2]);
-            plu.Group = Convert.ToByte(sPlu[3]);
-            plu.PriceType = Convert.ToByte(sPlu[4]);
-            plu.Price = Convert.ToDouble(sPlu[5].Replace(".",","));
-            plu.Turnover = Convert.ToDouble(sPlu[6].Replace(".", ","));
-            plu.SoldQty = Convert.ToDouble(sPlu[7].Replace(".", ","));
-            plu.StockQty = Convert.ToDouble(sPlu[8].Replace(".", ","));
-            plu.Bar1 = sPlu[9];
-            plu.Bar2 = sPlu[10];
-            plu.Bar3 = sPlu[11];
-            plu.Bar4 = sPlu[12];
-            plu.Name = sPlu[13];
-            plu.ConnectedPLU = Convert.ToInt32(sPlu[14]);
+            plu.Code = Convert.ToInt32(lPlu[0]);
+            plu.TaxGr = Convert.ToByte(lPlu[1]);
+            plu.Dep = Convert.ToByte(lPlu[2]);
+            plu.Group = Convert.ToByte(lPlu[3]);
+            plu.PriceType = Convert.ToByte(lPlu[4]);
+            plu.Price = Convert.ToDouble(lPlu[5].Replace(".",","));
+            plu.Turnover = Convert.ToDouble(lPlu[6].Replace(".", ","));
+            plu.SoldQty = Convert.ToDouble(lPlu[7].Replace(".", ","));
+            plu.StockQty = Convert.ToDouble(lPlu[8].Replace(".", ","));
+            plu.Bar1 = lPlu[9];
+            plu.Bar2 = lPlu[10];
+            plu.Bar3 = lPlu[11];
+            plu.Bar4 = lPlu[12];
+            plu.Name = lPlu[13];
+            plu.ConnectedPLU = Convert.ToInt32(lPlu[14]);
 
             return true;
         }
 
+        private bool SetDocForRead(int docNumber)
+        {
 
+            return false;
+        }
+
+        
 
 
 #endregion Privat methods
