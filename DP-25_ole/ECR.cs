@@ -320,8 +320,16 @@ namespace Delphin
             if (Send(sendBytes))
             {
                 //Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
-                Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
-                return true;
+              //  Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
+                List<string> lAnswer = Separating();
+                if(lAnswer.Count == 4)
+                {
+                    eJfirstDoc = Convert.ToInt32(lAnswer[2]);
+                    eJfirstDoc = Convert.ToInt32(lAnswer[3]);
+                    return true;
+                }
+                
+                return false;
             }
             return false;
         }
@@ -395,9 +403,9 @@ namespace Delphin
         {
             List<string> lPlu = new List<string>();
             String temp = String.Empty;
-            for (int i = 8; i < answerlenght - 1; i++) // перебор массива ответа
+            for (int i = 8; i < answerlenght; i++) // перебор массива ответа
             {
-                if (answer[i] != 9) // не встретили сепаратор
+                if (answer[i] != 09) // не встретили сепаратор
                 {
                     temp += ASCIIEncoding.Default.GetString(answer, i, 1);
                 }
