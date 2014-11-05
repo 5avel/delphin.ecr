@@ -6,7 +6,7 @@ using Delphin;
 namespace ConsoleApplication1
 {
     class Program
-    {
+    {/// test comita
         static void Main(string[] args)
         {
             ECR ecr = new ECR();
