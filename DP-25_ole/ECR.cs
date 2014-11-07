@@ -314,7 +314,11 @@ namespace Delphin
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 52, 09};
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(startData + " DST")).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
-            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(endDate + " DST")).ToArray();
+            if(endDate != "")
+            {
+                sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(endDate + " DST")).ToArray();
+            }
+            
             sendBytes = sendBytes.Concat(SEP).ToArray();
 
             if (Send(sendBytes))
@@ -325,7 +329,7 @@ namespace Delphin
                 if(lAnswer.Count == 4)
                 {
                     eJfirstDoc = Convert.ToInt32(lAnswer[2]);
-                    eJfirstDoc = Convert.ToInt32(lAnswer[3]);
+                    eJlastDoc = Convert.ToInt32(lAnswer[3]);
                     return true;
                 }
                 
@@ -342,12 +346,38 @@ namespace Delphin
         /// <returns></returns>
         public bool GetDocNumberByData(string startData, string endDate)
         {
-            return GetDocNumberByDataTime(startData + " 00:00:00", endDate+" 23:59:59");
+            if (endDate == "")
+            {
+                return GetDocNumberByDataTime(startData + " 00:00:00", endDate + "");
+            }
+            else
+            {
+                return GetDocNumberByDataTime(startData + " 00:00:00", endDate + " 23:59:59");
+            }
         }
 
-        public bool ReadDoc()
+        public List<string> PrintEKL(string startData, string endData)
         {
-            return true;
+            List<string> ekl = new List<string>();
+            if(GetDocNumberByData(startData, endData))// получаеем номер первого и последнего документа за указонный перио, и записывем их в приватные поля класса
+            { // ели получили то продолжаем дальше
+                for(int i = eJfirstDoc; i<=eJlastDoc;i++) // перебираем документы
+                {
+                    if(SetDocForRead(i))
+                    {
+                       string s = ReadDocStr(i);
+                        while (s != null)
+                        {
+                            ekl.Add(s);
+                            s = ReadDocStr(i);
+                        }
+                    }
+
+                }
+            }
+
+
+            return ekl;
         }
 
 
@@ -421,7 +451,7 @@ namespace Delphin
         /// задает документ для чтения
         /// </summary>
         /// <param name="docNumber"></param>
-        /// <returns></returns>
+        /// <returns>bool</returns>
         public bool SetDocForRead(int docNumber)
         {// 125 | 1 | docNum
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 48, 09};
@@ -429,12 +459,32 @@ namespace Delphin
             sendBytes = sendBytes.Concat(SEP).ToArray();
             if (Send(sendBytes))
             {
-                Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
+                //Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
                 return true;
             }
 
-            Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
+            //Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
             return false;
+        }
+
+        /// <summary>
+        /// Возвращает оодну стоку заданного документа документа за вызов
+        /// </summary>
+        /// <param name="docNumber"></param>
+        /// <returns>string - одна строка из документа</returns>
+        public string ReadDocStr(int docNumber)
+        {// 125 | 1 | docNum
+            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 49, 09 };
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            if (Send(sendBytes))
+            {
+                //Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
+                return Encoding.Default.GetString(answer, 7, answerlenght-8);
+            }
+
+            //Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
+            return null;
         }
 
         
