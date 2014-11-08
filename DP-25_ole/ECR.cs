@@ -304,22 +304,13 @@ namespace Delphin
         }
 
         /// <summary>
-        /// Получает диапозон документов пробитых в заданном промежутке времени.
+        /// Возвращает номер последнего документа
         /// </summary>
-        /// <param name="startData">>DD-MM-YY HH:MM:ss< Если пусто, то значение устанавливается как дата фискализации</param>
-        /// <param name="endDate">>DD-MM-YY HH:MM:ss< Если пусто, то значение устанавливается как дата последнего фискального документа</param>
-        /// <returns></returns>
-        public bool GetDocNumberByDataTime(string startData, string endDate)
+        /// <param name="Data">>DD-MM-YY HH:MM:ss< Если пусто, то значение устанавливается как дата фискализации</param>
+        /// <returns> int - номер документа.</returns>
+        public int GetLastDocNumber()
         {
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 52, 09};
-            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(startData + " DST")).ToArray();
-            sendBytes = sendBytes.Concat(SEP).ToArray();
-            if(endDate != "")
-            {
-                sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(endDate + " DST")).ToArray();
-            }
-            
-            sendBytes = sendBytes.Concat(SEP).ToArray();
+            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 52, 09, 09, 09};
 
             if (Send(sendBytes))
             {
@@ -328,56 +319,28 @@ namespace Delphin
                 List<string> lAnswer = Separating();
                 if(lAnswer.Count == 4)
                 {
-                    eJfirstDoc = Convert.ToInt32(lAnswer[2]);
-                    eJlastDoc = Convert.ToInt32(lAnswer[3]);
-                    return true;
+                    return Convert.ToInt32(lAnswer[3]);
                 }
                 
-                return false;
+                return 0;
             }
-            return false;
+            return 0;
         }
 
-         /// <summary>
-        /// Получает диапозон документов пробитых в заданном промежутке времени.
-        /// </summary>
-        /// <param name="startData">>DD-MM-YY< Дата с включительно. Если пусто, то значение устанавливается как дата фискализации</param>
-        /// <param name="endDate">>DD-MM-YY< Дата по включительно. Если пусто, то значение устанавливается как дата последнего фискального документа</param>
-        /// <returns></returns>
-        public bool GetDocNumberByData(string startData, string endDate)
-        {
-            if (endDate == "")
-            {
-                return GetDocNumberByDataTime(startData + " 00:00:00", endDate + "");
-            }
-            else
-            {
-                return GetDocNumberByDataTime(startData + " 00:00:00", endDate + " 23:59:59");
-            }
-        }
-
-        public List<string> PrintEKL(string startData, string endData)
+        public List<string> GetDocTxtByNum(int num)
         {
             List<string> ekl = new List<string>();
-            if(GetDocNumberByData(startData, endData))// получаеем номер первого и последнего документа за указонный перио, и записывем их в приватные поля класса
-            { // ели получили то продолжаем дальше
-                for(int i = eJfirstDoc; i<=eJlastDoc;i++) // перебираем документы
+            if(SetDocForRead(num))
+            {
+                string s = ReadDocStr(num);
+                while (s != null)
                 {
-                    if(SetDocForRead(i))
-                    {
-                       string s = ReadDocStr(i);
-                        while (s != null)
-                        {
-                            ekl.Add(s);
-                            s = ReadDocStr(i);
-                        }
-                    }
-
+                    ekl.Add(s);
+                    s = ReadDocStr(num);
                 }
+                return ekl;
             }
-
-
-            return ekl;
+            return null;            
         }
 
 

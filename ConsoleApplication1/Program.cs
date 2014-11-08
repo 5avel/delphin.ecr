@@ -12,12 +12,19 @@ namespace ConsoleApplication1
             ECR ecr = new ECR();
             Console.WriteLine("Connect - " + ecr.Connect("in4.pp.ua", 5999, 1).ToString());
 
-            var ekl = ecr.PrintEKL("26-10-14", "");
-
-            foreach(string s in ekl)
+            Console.WriteLine(" lst - " + ecr.GetLastDocNumber());
+            for(int i = 71; i <= ecr.GetLastDocNumber(); ++i)
             {
-                Console.WriteLine(s);
+                var doc = ecr.GetDocTxtByNum(i);
+                if (true)
+                {
+                    foreach (string s in doc)
+                    {
+                        Console.WriteLine(s);
+                    }
+                }
             }
+            
 
 
             ////Console.WriteLine("GetDataTime " + ecr.GetDataTime().ToString()); 11 22 26 49
