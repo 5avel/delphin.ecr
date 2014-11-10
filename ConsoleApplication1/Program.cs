@@ -12,18 +12,43 @@ namespace ConsoleApplication1
             ECR ecr = new ECR();
             Console.WriteLine("Connect - " + ecr.Connect("in4.pp.ua", 5999, 1).ToString());
 
-            Console.WriteLine(" lst - " + ecr.GetLastDocNumber());
-            for(int i = 71; i <= ecr.GetLastDocNumber(); ++i)
+            //Console.WriteLine(" lst - " + ecr.GetLastDocNumber());
+
+            //ecr.GetDateDocByDocNum(ecr.GetLastDocNumber());
+            //var doc = ecr.GetDocTxtByNum(ecr.GetLastDocNumber());
+            //foreach (string s in doc)
+            //{
+            //     Console.WriteLine(s);
+            //}
+            ecr.SetDocForRead(ecr.GetLastDocNumber());
+            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
+            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
+            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
+            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
+            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
+            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
+            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
+
+            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
+
+            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
+
+            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
+
+            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
+
+            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
+            //for (int i = 65; i <= ecr.GetLastDocNumber(); ++i)
+            //{
+            var doc = ecr.GetDocTxtByNum(72);
+            if (doc != null)
             {
-                var doc = ecr.GetDocTxtByNum(i);
-                if (true)
+                foreach (string s in doc)
                 {
-                    foreach (string s in doc)
-                    {
-                        Console.WriteLine(s);
-                    }
+                    Console.WriteLine(s);
                 }
             }
+            //}
             
 
 
@@ -76,10 +101,10 @@ namespace ConsoleApplication1
             //Console.WriteLine("SetDocForRead(49) - " + ecr.SetDocForRead(49).ToString());
 
             Console.WriteLine("DisConnect - " + ecr.Disconnect().ToString());
-            //byte[] b = { };
-            //Console.WriteLine(Encoding.ASCII.GetString(b));
+            //byte[] b = {89, 119, 65, 65 };
+            //Console.WriteLine(Convert.FromBase64String(b.ToString()));
 
-            //Console.WriteLine(BitConverter.ToString(Encoding.Default.GetBytes("124|17-10-14 00:00:01 DST|20-10-14 00:00:01 DST|")));
+            ////Console.WriteLine(BitConverter.ToString(Encoding.Default.GetBytes("124|17-10-14 00:00:01 DST|20-10-14 00:00:01 DST|")));
 
            // Console.WriteLine(BitConverter.ToString(Encoding.Default.GetBytes("1240")));
 

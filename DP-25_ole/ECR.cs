@@ -18,14 +18,16 @@ namespace Delphin
         private byte[] SEP = {9};
         private byte[] answer = new byte[256];
         private int answerlenght = 0;
-
-        private int eJfirstDoc = 0, eJlastDoc = 0; // поля заполняются методом GetDocNumber(ДатаС, ДатаПО), если вернул true.
  
 #endregion Private Field
+
+
 
 #region Public Field
         public PLU plu = new PLU();
 #endregion Public Field
+
+
 
 #region Public methods
 
@@ -255,22 +257,6 @@ namespace Delphin
             return WritePlu(plu, taxGr, price, "", name);
         }
 
-        /// <summary>
-        /// Check for mode connection with PC Проверить на COM порту.
-        /// </summary>
-        /// <returns></returns>
-        public bool CheckMode()
-        {                                                             // D
-                                                       //31h 30h 37h 09h 44h 09h  
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 45, 09 };
-
-            if (Send(sendBytes))
-            {
-                return true;
-            }
-            return false;
-        }
-
         public string GetDataTime()
         {                                                             // D
             //31h 30h 37h 09h 44h 09h  
@@ -304,9 +290,8 @@ namespace Delphin
         }
 
         /// <summary>
-        /// Возвращает номер последнего документа
+        /// Возвращает номер последнего документа в ЭКЛ.(включая не фмскальные документы.)
         /// </summary>
-        /// <param name="Data">>DD-MM-YY HH:MM:ss< Если пусто, то значение устанавливается как дата фискализации</param>
         /// <returns> int - номер документа.</returns>
         public int GetLastDocNumber()
         {
@@ -327,6 +312,23 @@ namespace Delphin
             return 0;
         }
 
+        /// <summary>
+        /// Возвращает номер первого документа на заданную дату.
+        /// </summary>
+        /// <param name="date">дата документа ДД-ММ-ГГ</param>
+        /// <returns></returns>
+        public int GetFirstDocNumberByDate(string date)
+        {
+            // Проверка даты.
+            int maxDocNum = GetLastDocNumber();
+            return 0;
+        }
+
+        /// <summary>
+        /// Возвращает заданный документ в текстовом виде.
+        /// </summary>
+        /// <param name="num">Номер документа.</param>
+        /// <returns>Список строк документа. В случаее ошибки вернет NULL.</returns>
         public List<string> GetDocTxtByNum(int num)
         {
             List<string> ekl = new List<string>();
@@ -343,13 +345,38 @@ namespace Delphin
             return null;            
         }
 
-
-
+        /// <summary>
+        /// Возвращает заданный документ в текстовом виде.
+        /// </summary>
+        /// <param name="num">Номер документа.</param>
+        /// <returns>Список строк документа. В случаее ошибки вернет NULL.</returns>
+        public List<string> GetDocByNum(int num)
+        {
+            List<string> ekl = new List<string>();
+            if (SetDocForRead(num))
+            {
+                string s = ReadDocStr(num);
+                while (s != null)
+                {
+                    ekl.Add(s);
+                    s = ReadDocStr(num);
+                }
+                return ekl;
+            }
+            return null;
+        }
 
 #endregion Public methods
 
+
+
 #region Privat methods
 
+        /// <summary>
+        /// Метод отправляет массив байт и обрабатывает ответ.
+        /// </summary>
+        /// <param name="sendBytes"> Массив байт для отправки.</param>
+        /// <returns></returns>
         private bool Send(byte[] sendBytes)
         {
             if (client.Connected)
@@ -394,7 +421,7 @@ namespace Delphin
         /// <returns>Массив строк.</returns>
         private List<string> Separating()
         {
-            List<string> lPlu = new List<string>();
+            List<string> lStr = new List<string>();
             String temp = String.Empty;
             for (int i = 8; i < answerlenght; i++) // перебор массива ответа
             {
@@ -404,12 +431,13 @@ namespace Delphin
                 }
                 else // втретили сепаратор - значит конец строки. 
                 {
-                    lPlu.Add(temp);
+                    lStr.Add(temp);
                     temp = String.Empty;      
                 }
             }
-            return lPlu;
+            return lStr;
         }
+
         /// <summary>
         /// задает документ для чтения
         /// </summary>
@@ -422,11 +450,8 @@ namespace Delphin
             sendBytes = sendBytes.Concat(SEP).ToArray();
             if (Send(sendBytes))
             {
-                //Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
                 return true;
             }
-
-            //Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
             return false;
         }
 
@@ -442,16 +467,58 @@ namespace Delphin
             sendBytes = sendBytes.Concat(SEP).ToArray();
             if (Send(sendBytes))
             {
-                //Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
                 return Encoding.Default.GetString(answer, 7, answerlenght-8);
             }
-
-            //Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
             return null;
         }
 
-        
+        /// <summary>
+        /// Возвращает оодну стоку заданного документа документа за вызов
+        /// </summary>
+        /// <param name="docNumber"></param>
+        /// <returns>string - одна строка из документа</returns>
+        public string ReadDoc(int docNumber)
+        {// 125 | 1 | docNum
+            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 50, 09 };
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            if (Send(sendBytes))
+            {
+              //  Console.WriteLine(BitConverter.ToString(answer,8, answerlenght-9)); // массив байт
+                string s = ASCIIEncoding.ASCII.GetString(answer, 8, answerlenght-9);
+                //Console.WriteLine(s);
+                byte[] buf = Convert.FromBase64String(s);
+                Console.WriteLine(BitConverter.ToString(buf));
+                double d = BitConverter.ToChar(buf, 9);
+                Console.WriteLine(d.ToString());
+                Console.WriteLine(Encoding.Default.GetString(buf, 44, 32)+"\n\n");
 
+                //Console.WriteLine(Convert.ToString(answer, 8, answerlenght-9, 2);
+                //Console.WriteLine(BitConverter.ToInt32(Convert.FromBase64CharArray(Encoding.Default.GetChars(answer, 8, 1),0,1),0).ToString());
+                //Console.WriteLine(Encoding.ASCII.(Convert.FromBase64CharArray(Encoding.Default.GetChars(answer, 0, 1), 0, 1)).ToString());
+                //return BitConverter.ToString(Convert.FromBase64CharArray(Encoding.Default.GetChars(answer, 8, answerlenght - 1), 0, answerlenght - 9), 0).ToString();
+                return ""; //BitConverter.ToString(Convert.FromBase64CharArray(Encoding.Default.GetChars(answer, 8, answerlenght-1),0,answerlenght-9),0).ToString();
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Возвращает дату документа с заданным номером.
+        /// </summary>
+        /// <param name="docNumber">Номер документа.</param>
+        /// <returns>DateTime - Дата документа.</returns>
+        private DateTime GetDateDocByDocNum(int docNumber)
+        {
+            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 48, 09 };
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            if (Send(sendBytes))
+            {
+                List<string> lStr = Separating();
+                return DateTime.Parse(lStr[1]);
+            }
+            return DateTime.MinValue;
+        }
 
 #endregion Privat methods
 
