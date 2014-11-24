@@ -486,7 +486,7 @@ namespace Delphin
             {
               //  Console.WriteLine(BitConverter.ToString(answer,8, answerlenght-9)); // массив байт
                 string s = ASCIIEncoding.ASCII.GetString(answer, 8, answerlenght-9);
-                //Console.WriteLine(s);
+                Console.WriteLine(BitConverter.ToString(answer, 8, answerlenght-9));
                 byte[] buf = Convert.FromBase64String(s);
                 Console.WriteLine(BitConverter.ToString(buf));
                 double d = BitConverter.ToChar(buf, 9);

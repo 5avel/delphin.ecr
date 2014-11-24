@@ -9,8 +9,12 @@ namespace ConsoleApplication1
     {/// test comita
         static void Main(string[] args)
         {
+
+            double d = BitConverter.ToSingle(new byte[] {207, 04, 00, 00}, 0);
+            Console.Write(d.ToString());
+
             ECR ecr = new ECR();
-            Console.WriteLine("Connect - " + ecr.Connect("in4.pp.ua", 5999, 1).ToString());
+            Console.WriteLine("Connect - " + ecr.Connect("192.168.88.53", 5999, 1).ToString());
 
             //Console.WriteLine(" lst - " + ecr.GetLastDocNumber());
 
@@ -20,24 +24,21 @@ namespace ConsoleApplication1
             //{
             //     Console.WriteLine(s);
             //}
-            ecr.SetDocForRead(ecr.GetLastDocNumber());
-            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
-            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
-            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
-            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
-            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
-            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
-            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
 
-            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
+            ecr.SetDocForRead(72);
 
-            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
+            Console.WriteLine(ecr.ReadDoc(72));
 
-            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
-
-            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
-
-            Console.WriteLine(ecr.ReadDoc(ecr.GetLastDocNumber()));
+            Console.WriteLine(ecr.ReadDoc(72));
+            Console.WriteLine(ecr.ReadDoc(72));
+            Console.WriteLine(ecr.ReadDoc(72));
+            Console.WriteLine(ecr.ReadDoc(72));
+            Console.WriteLine(ecr.ReadDoc(72));
+            Console.WriteLine(ecr.ReadDoc(72));
+            Console.WriteLine(ecr.ReadDoc(72));
+            Console.WriteLine(ecr.ReadDoc(72));
+            Console.WriteLine(ecr.ReadDoc(72));
+            Console.WriteLine(ecr.ReadDoc(72));
             //for (int i = 65; i <= ecr.GetLastDocNumber(); ++i)
             //{
             var doc = ecr.GetDocTxtByNum(72);
@@ -76,7 +77,7 @@ namespace ConsoleApplication1
             //ecr.Beep(1000, 100).ToString();
             //ecr.Beep(500, 100).ToString();
 
-            //Console.WriteLine("rename PLU   "+ ecr.WritePlu(15, 1, 1, 1, 0, 6, 0, 3.521, "", "", "", "", "Чай Ахмат", 0).ToString());
+           //Console.WriteLine("rename PLU   "+ ecr.WritePlu(1522, 1, 1, 1, 0, 6, 0, 3.521, "", "", "", "", "Чай Ахмат Tea", 0).ToString());
             //ecr.ReadPlu(15);
             //Console.WriteLine(ecr.plu.Code + "\t|  " + ecr.plu.TaxGr + "\t|  " + ecr.plu.StockQty + "\t|  " + ecr.plu.Price + "\t|  " + ecr.plu.Name);
 
