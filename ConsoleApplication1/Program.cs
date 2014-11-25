@@ -16,7 +16,7 @@ namespace ConsoleApplication1
             ECR ecr = new ECR();
             Console.WriteLine("Connect - " + ecr.Connect("192.168.88.53", 5999, 1).ToString());
 
-            //Console.WriteLine(" lst - " + ecr.GetLastDocNumber());
+            //Console.WriteLine(" last - " + ecr.GetLastDocNumber());
 
             //ecr.GetDateDocByDocNum(ecr.GetLastDocNumber());
             //var doc = ecr.GetDocTxtByNum(ecr.GetLastDocNumber());
@@ -24,27 +24,28 @@ namespace ConsoleApplication1
             //{
             //     Console.WriteLine(s);
             //}
+            int doc = 50;
+            ecr.SetDocForRead(doc);
 
-            ecr.SetDocForRead(72);
+            Console.WriteLine(ecr.ReadDoc(doc));
 
-            Console.WriteLine(ecr.ReadDoc(72));
-
-            Console.WriteLine(ecr.ReadDoc(72));
-            Console.WriteLine(ecr.ReadDoc(72));
-            Console.WriteLine(ecr.ReadDoc(72));
-            Console.WriteLine(ecr.ReadDoc(72));
-            Console.WriteLine(ecr.ReadDoc(72));
-            Console.WriteLine(ecr.ReadDoc(72));
-            Console.WriteLine(ecr.ReadDoc(72));
-            Console.WriteLine(ecr.ReadDoc(72));
-            Console.WriteLine(ecr.ReadDoc(72));
-            Console.WriteLine(ecr.ReadDoc(72));
+            Console.WriteLine(ecr.ReadDoc(doc));
+            Console.WriteLine(ecr.ReadDoc(doc));
+            Console.WriteLine(ecr.ReadDoc(doc));
+            Console.WriteLine(ecr.ReadDoc(doc));
+            Console.WriteLine(ecr.ReadDoc(doc));
+            Console.WriteLine(ecr.ReadDoc(doc));
+            Console.WriteLine(ecr.ReadDoc(doc));
+            Console.WriteLine(ecr.ReadDoc(doc));
+            Console.WriteLine(ecr.ReadDoc(doc));
+            Console.WriteLine(ecr.ReadDoc(doc));
+            Console.WriteLine(ecr.ReadDoc(doc));
             //for (int i = 65; i <= ecr.GetLastDocNumber(); ++i)
             //{
-            var doc = ecr.GetDocTxtByNum(72);
-            if (doc != null)
+            var docStr = ecr.GetDocTxtByNum(doc);
+            if (docStr != null)
             {
-                foreach (string s in doc)
+                foreach (string s in docStr)
                 {
                     Console.WriteLine(s);
                 }
@@ -102,8 +103,18 @@ namespace ConsoleApplication1
             //Console.WriteLine("SetDocForRead(49) - " + ecr.SetDocForRead(49).ToString());
 
             Console.WriteLine("DisConnect - " + ecr.Disconnect().ToString());
-            //byte[] b = {89, 119, 65, 65 };
-            //Console.WriteLine(Convert.FromBase64String(b.ToString()));
+            byte[] b = {242, 05, 00, 00, 00, 00, 00, 00 };
+            Console.WriteLine(BitConverter.ToUInt64(b, 0)); // Код товара
+
+            byte[] b1 = { 136, 19, 00, 00, 00, 00, 00, 00 };
+            Console.WriteLine(BitConverter.ToUInt32(b1, 0)); // Количество в граммах
+
+            byte[] b2 = { 184, 11, 00, 00, 00, 00, 00, 00 };
+            Console.WriteLine(BitConverter.ToUInt32(b2, 0)); // Количество в граммах
+
+            byte[] b3 = { 88, 02, 00, 00 };
+            Console.WriteLine(BitConverter.ToUInt32(b3, 0)); // Количество в граммах
+
 
             ////Console.WriteLine(BitConverter.ToString(Encoding.Default.GetBytes("124|17-10-14 00:00:01 DST|20-10-14 00:00:01 DST|")));
 

@@ -18,6 +18,89 @@ namespace Delphin
         private byte[] SEP = {9};
         private byte[] answer = new byte[256];
         private int answerlenght = 0;
+
+
+        enum tagRClass 
+        {
+            PLUSELL = 1,
+            DPxSELL = 2,
+            PAYMENT = 3,
+            OTS_NDB = 4,
+            RA_PO = 5,
+            VD_PLUSELL = 8,
+            VD_DPxSELL = 9,
+            VD_OTS_NDB = 10,
+            ABONAT = 11,
+            BEGPAY = 12,
+            ALL_VOID = 18,
+            REPORTS = 19,
+            TEXT_LINE = 20,
+            OPEN = 99,
+            CLOSE = 100,
+            ZREP_TXS = 200,
+            ZREP_M = 201,
+            ZREP_IO = 202,
+            ZREP_NC = 203, 
+        };
+
+        enum tagRSubClassPerc 
+        { 
+            PERC_NONE = 0,
+            PERC_SURCHARGE = 1,
+            PERC_DISCOUNT = 2,
+            VAL_SURCHARGE = 3,
+            VAL_DISCOUNT = 4,
+            PERC_UNKNOWN = 5,
+            VAL_DISCOUNTplu = 6,
+            VAL_DISCOUNTstl = 7 };
+
+        struct tagRCMDsell
+        {
+            tagRClass type;
+            object filler0;
+            object SeqOperation;
+            object cancel;
+            object fMyPluDB;
+            object vat;
+            object filler1;
+            object prc;
+            object filler2;
+            object suma;
+            object icode;
+            object bcode;
+            object qty;
+            object name;
+            tagRSubClassPerc typeIncDec;
+            object dep;
+            object[] filler3;
+            object sIncDec;
+            object grp;
+            object vatGroup;
+        };
+
+        //struct tagRCMDsell
+        //{
+        //    tagRClass type;
+        //    object filler0;
+        //    Int16 SeqOperation;
+        //    byte cancel;
+        //    byte fMyPluDB;
+        //    byte vat;
+        //    byte filler1;
+        //    double prc;
+        //    byte[] filler2;
+        //    double suma;
+        //    Int64 icode;
+        //    Int64 bcode;
+        //    int qty;
+        //    char[] name;
+        //    tagRSubClassPerc typeIncDec;
+        //    byte dep;
+        //    byte[] filler3;
+        //    int sIncDec;
+        //    byte grp;
+        //    byte vatGroup;
+        //};
  
 #endregion Private Field
 
@@ -484,20 +567,19 @@ namespace Delphin
             sendBytes = sendBytes.Concat(SEP).ToArray();
             if (Send(sendBytes))
             {
-              //  Console.WriteLine(BitConverter.ToString(answer,8, answerlenght-9)); // массив байт
                 string s = ASCIIEncoding.ASCII.GetString(answer, 8, answerlenght-9);
-                Console.WriteLine(BitConverter.ToString(answer, 8, answerlenght-9));
-                byte[] buf = Convert.FromBase64String(s);
+                byte[] buf = Convert.FromBase64String(s); // расшифровонная строка
                 Console.WriteLine(BitConverter.ToString(buf));
-                double d = BitConverter.ToChar(buf, 9);
-                Console.WriteLine(d.ToString());
-                Console.WriteLine(Encoding.Default.GetString(buf, 44, 32)+"\n\n");
 
-                //Console.WriteLine(Convert.ToString(answer, 8, answerlenght-9, 2);
-                //Console.WriteLine(BitConverter.ToInt32(Convert.FromBase64CharArray(Encoding.Default.GetChars(answer, 8, 1),0,1),0).ToString());
-                //Console.WriteLine(Encoding.ASCII.(Convert.FromBase64CharArray(Encoding.Default.GetChars(answer, 0, 1), 0, 1)).ToString());
-                //return BitConverter.ToString(Convert.FromBase64CharArray(Encoding.Default.GetChars(answer, 8, answerlenght - 1), 0, answerlenght - 9), 0).ToString();
-                return ""; //BitConverter.ToString(Convert.FromBase64CharArray(Encoding.Default.GetChars(answer, 8, answerlenght-1),0,answerlenght-9),0).ToString();
+                if (buf[0] == 01)
+                {
+                    Console.WriteLine("Код товара: " + BitConverter.ToUInt64(buf, 24));
+                    Console.WriteLine("Наименование товара: " + Encoding.Default.GetString(buf, 44, 32));
+                    Console.WriteLine("Цена за еденицу(кг.): " + Convert.ToDouble(BitConverter.ToUInt32(buf, 8)) / 100);
+                    Console.WriteLine("Количество товара: " + Convert.ToDouble(BitConverter.ToUInt32(buf, 40)) / 1000);
+                    Console.WriteLine("Сумма: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100);
+                }
+                return ""; 
             }
             return null;
         }
