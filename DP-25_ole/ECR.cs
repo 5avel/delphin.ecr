@@ -19,88 +19,6 @@ namespace Delphin
         private byte[] answer = new byte[256];
         private int answerlenght = 0;
 
-
-        enum tagRClass 
-        {
-            PLUSELL = 1,
-            DPxSELL = 2,
-            PAYMENT = 3,
-            OTS_NDB = 4,
-            RA_PO = 5,
-            VD_PLUSELL = 8,
-            VD_DPxSELL = 9,
-            VD_OTS_NDB = 10,
-            ABONAT = 11,
-            BEGPAY = 12,
-            ALL_VOID = 18,
-            REPORTS = 19,
-            TEXT_LINE = 20,
-            OPEN = 99,
-            CLOSE = 100,
-            ZREP_TXS = 200,
-            ZREP_M = 201,
-            ZREP_IO = 202,
-            ZREP_NC = 203, 
-        };
-
-        enum tagRSubClassPerc 
-        { 
-            PERC_NONE = 0,
-            PERC_SURCHARGE = 1,
-            PERC_DISCOUNT = 2,
-            VAL_SURCHARGE = 3,
-            VAL_DISCOUNT = 4,
-            PERC_UNKNOWN = 5,
-            VAL_DISCOUNTplu = 6,
-            VAL_DISCOUNTstl = 7 };
-
-        struct tagRCMDsell
-        {
-            tagRClass type;
-            object filler0;
-            object SeqOperation;
-            object cancel;
-            object fMyPluDB;
-            object vat;
-            object filler1;
-            object prc;
-            object filler2;
-            object suma;
-            object icode;
-            object bcode;
-            object qty;
-            object name;
-            tagRSubClassPerc typeIncDec;
-            object dep;
-            object[] filler3;
-            object sIncDec;
-            object grp;
-            object vatGroup;
-        };
-
-        //struct tagRCMDsell
-        //{
-        //    tagRClass type;
-        //    object filler0;
-        //    Int16 SeqOperation;
-        //    byte cancel;
-        //    byte fMyPluDB;
-        //    byte vat;
-        //    byte filler1;
-        //    double prc;
-        //    byte[] filler2;
-        //    double suma;
-        //    Int64 icode;
-        //    Int64 bcode;
-        //    int qty;
-        //    char[] name;
-        //    tagRSubClassPerc typeIncDec;
-        //    byte dep;
-        //    byte[] filler3;
-        //    int sIncDec;
-        //    byte grp;
-        //    byte vatGroup;
-        //};
  
 #endregion Private Field
 
@@ -579,6 +497,18 @@ namespace Delphin
                     Console.WriteLine("Количество товара: " + Convert.ToDouble(BitConverter.ToUInt32(buf, 40)) / 1000);
                     Console.WriteLine("Сумма: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100);
                 }
+                else if (buf[0] == 04)
+                {
+                    if (buf[6] == 01)
+                    {
+                        Console.WriteLine("Процент наценки: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100);
+                    }
+                    else if (buf[6] == 02)
+                    {
+                        Console.WriteLine("Процент скидки: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100);
+                    }
+                }
+
                 return ""; 
             }
             return null;

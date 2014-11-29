@@ -24,7 +24,7 @@ namespace ConsoleApplication1
             //{
             //     Console.WriteLine(s);
             //}
-            int doc = 50;
+            int doc = ecr.GetLastDocNumber();
             ecr.SetDocForRead(doc);
 
             Console.WriteLine(ecr.ReadDoc(doc));
@@ -112,7 +112,7 @@ namespace ConsoleApplication1
             byte[] b2 = { 184, 11, 00, 00, 00, 00, 00, 00 };
             Console.WriteLine(BitConverter.ToUInt32(b2, 0)); // Количество в граммах
 
-            byte[] b3 = { 88, 02, 00, 00 };
+            byte[] b3 = { 244, 01, 00, 00 };
             Console.WriteLine(BitConverter.ToUInt32(b3, 0)); // Количество в граммах
 
 
