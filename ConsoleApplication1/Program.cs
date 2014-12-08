@@ -24,7 +24,7 @@ namespace ConsoleApplication1
             //{
             //     Console.WriteLine(s);
             //}
-            int doc = ecr.GetLastDocNumber();
+            int doc = ecr.GetLastDocNumber()-1;
             ecr.SetDocForRead(doc);
 
             Console.WriteLine(ecr.ReadDoc(doc));

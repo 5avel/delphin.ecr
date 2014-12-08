@@ -508,6 +508,10 @@ namespace Delphin
                         Console.WriteLine("Процент скидки: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100);
                     }
                 }
+                else if (buf[0] == 03) // Оплата
+                {
+                    Console.WriteLine("Вид оплаты: " + buf[4].ToString()); // Вид оплаты(0-нал, 1-карта, 2-кредит, 3-чек)
+                }
 
                 return ""; 
             }
