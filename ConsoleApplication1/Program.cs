@@ -9,10 +9,6 @@ namespace ConsoleApplication1
     {/// test comita
         static void Main(string[] args)
         {
-
-            double d = BitConverter.ToSingle(new byte[] {207, 04, 00, 00}, 0);
-            Console.Write(d.ToString());
-
             ECR ecr = new ECR();
             Console.WriteLine("Connect - " + ecr.Connect("192.168.88.53", 5999, 1).ToString());
 
@@ -24,7 +20,7 @@ namespace ConsoleApplication1
             //{
             //     Console.WriteLine(s);
             //}
-            int doc = ecr.GetLastDocNumber();
+            int doc = ecr.GetLastDocNumber()-1;
             ecr.SetDocForRead(doc);
 
             Console.WriteLine(ecr.ReadDoc(doc));
@@ -103,17 +99,17 @@ namespace ConsoleApplication1
             //Console.WriteLine("SetDocForRead(49) - " + ecr.SetDocForRead(49).ToString());
 
             Console.WriteLine("DisConnect - " + ecr.Disconnect().ToString());
-            byte[] b = {242, 05, 00, 00, 00, 00, 00, 00 };
-            Console.WriteLine(BitConverter.ToUInt64(b, 0)); // Код товара
+            //byte[] b = {242, 05, 00, 00, 00, 00, 00, 00 };
+            //Console.WriteLine(BitConverter.ToUInt64(b, 0)); // Код товара
 
-            byte[] b1 = { 136, 19, 00, 00, 00, 00, 00, 00 };
-            Console.WriteLine(BitConverter.ToUInt32(b1, 0)); // Количество в граммах
+            //byte[] b1 = { 136, 19, 00, 00, 00, 00, 00, 00 };
+            //Console.WriteLine(BitConverter.ToUInt32(b1, 0)); // Количество в граммах
 
-            byte[] b2 = { 184, 11, 00, 00, 00, 00, 00, 00 };
-            Console.WriteLine(BitConverter.ToUInt32(b2, 0)); // Количество в граммах
+            //byte[] b2 = { 184, 11, 00, 00, 00, 00, 00, 00 };
+            //Console.WriteLine(BitConverter.ToUInt32(b2, 0)); // Количество в граммах
 
-            byte[] b3 = { 244, 01, 00, 00 };
-            Console.WriteLine(BitConverter.ToUInt32(b3, 0)); // Количество в граммах
+            //byte[] b3 = { 244, 01, 00, 00 };
+            //Console.WriteLine(BitConverter.ToUInt32(b3, 0)); // Количество в граммах
 
 
             ////Console.WriteLine(BitConverter.ToString(Encoding.Default.GetBytes("124|17-10-14 00:00:01 DST|20-10-14 00:00:01 DST|")));

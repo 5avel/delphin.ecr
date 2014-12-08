@@ -499,13 +499,27 @@ namespace Delphin
                 }
                 else if (buf[0] == 04)
                 {
-                    if (buf[6] == 01)
+                    if (buf[8] == 01)
                     {
-                        Console.WriteLine("Процент наценки: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100);
+                        if (buf[6] == 01)
+                        {
+                            Console.WriteLine("Процент надбавки на промежуточный итог: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100);
+                        }
+                        else if (buf[6] == 02)
+                        {
+                            Console.WriteLine("Процент скидки на промежуточный итог: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100);
+                        }
                     }
-                    else if (buf[6] == 02)
+                    else
                     {
-                        Console.WriteLine("Процент скидки: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100);
+                        if (buf[6] == 01)
+                        {
+                            Console.WriteLine("Процент надбавки на прошлую позицию: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100);
+                        }
+                        else if (buf[6] == 02)
+                        {
+                            Console.WriteLine("Процент скидки на прошлую позицию: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100);
+                        }
                     }
                 }
 
