@@ -9,6 +9,10 @@ namespace ConsoleApplication1
     {/// test comita
         static void Main(string[] args)
         {
+            Сheck ch1 = new Сheck();
+            ch1.PaymentList
+
+
             ECR ecr = new ECR();
             Console.WriteLine("Connect - " + ecr.Connect("192.168.88.53", 5999, 1).ToString());
 
@@ -154,3 +158,4 @@ namespace ConsoleApplication1
 //    Console.WriteLine("Exception: " + ex.ToString());
 //}
 //Console.ReadKey();
+
