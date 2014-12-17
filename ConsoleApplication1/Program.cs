@@ -23,22 +23,11 @@ namespace ConsoleApplication1
             //{
             //     Console.WriteLine(s);
             //}
-            int doc = ecr.GetLastDocNumber()-1;
-            ecr.SetDocForRead(doc);
+            int doc = ecr.GetLastDocNumber();
+            
 
             Console.WriteLine(ecr.ReadDoc(doc));
 
-            Console.WriteLine(ecr.ReadDoc(doc));
-            Console.WriteLine(ecr.ReadDoc(doc));
-            Console.WriteLine(ecr.ReadDoc(doc));
-            Console.WriteLine(ecr.ReadDoc(doc));
-            Console.WriteLine(ecr.ReadDoc(doc));
-            Console.WriteLine(ecr.ReadDoc(doc));
-            Console.WriteLine(ecr.ReadDoc(doc));
-            Console.WriteLine(ecr.ReadDoc(doc));
-            Console.WriteLine(ecr.ReadDoc(doc));
-            Console.WriteLine(ecr.ReadDoc(doc));
-            Console.WriteLine(ecr.ReadDoc(doc));
             //for (int i = 65; i <= ecr.GetLastDocNumber(); ++i)
             //{
             var docStr = ecr.GetDocTxtByNum(doc);

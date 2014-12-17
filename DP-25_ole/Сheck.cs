@@ -3,15 +3,15 @@ using System.Collections.ObjectModel;
 
 namespace Delphin
 {
-    private class Good
+    internal class Good
     {
-        private int code { get; set; }
-        private double price { get; set; }
-        private double quantity { get; set; }
-        private double sum { get; set; }
-        private double discSurc { get; set; }
+        internal uint code { get; set; }
+        internal double price { get; set; }
+        internal double quantity { get; set; }
+        internal double sum { get; set; }
+        internal double discSurc { get; set; }
 
-        internal Good(int code, double price, double quantity, double sum)
+        internal Good(uint code, double price, double quantity, double sum)
         {
             this.code = code;
             this.price = price;
@@ -21,7 +21,7 @@ namespace Delphin
         }
     }
 
-    private class Payment
+    internal class Payment
     {
         private byte type { get; set; }
         private double sum { get; set; }
@@ -38,14 +38,22 @@ namespace Delphin
     //дата время
     //товары со скидками и надбавками на товар, пидсумок со скидкой или надбавкой -  пробегает попредидушим товарам и проставляетим скидку и ли надавку.
     //оплаты
-    class Сheck
+    public class Check
     {
-        private DateTime dateTime {get; set;}
-        private int num { get; set; }
-        private Collection<Good> goods {get; set;}
-        private Collection<Payment> payments { get; set; }
+        internal DateTime dateTime { get; set; }
+        internal uint num { get; set; }
+        internal Collection<Good> goods { get; set; }
+        internal Collection<Payment> payments { get; set; }
 
-        public void AddGood(int code, double price, double quantity, double sum)
+        internal Check(DateTime dt, uint num)
+        {
+            this.dateTime = dt;
+            this.num = num;
+            this.goods = new Collection<Good>();
+            this.payments = new Collection<Payment>();
+        }
+
+        public void AddGood(uint code, double price, double quantity, double sum)
         {
             Good g = new Good(code, price, quantity, sum);
             this.goods.Add(g);

@@ -479,55 +479,77 @@ namespace Delphin
         /// <returns>string - одна строка из документа</returns>
         public string ReadDoc(int docNumber)
         {// 125 | 1 | docNum
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 50, 09 };
-            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
-            sendBytes = sendBytes.Concat(SEP).ToArray();
-            if (Send(sendBytes))
+            if (SetDocForRead(docNumber))
             {
-                string s = ASCIIEncoding.ASCII.GetString(answer, 8, answerlenght-9);
-                byte[] buf = Convert.FromBase64String(s); // расшифровонная строка
-                Console.WriteLine(BitConverter.ToString(buf));
-
-                if (buf[0] == 01)
+                byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 50, 09 };
+                sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
+                sendBytes = sendBytes.Concat(SEP).ToArray();
+                Check c = null;
+                while(Send(sendBytes))
                 {
-                    Console.WriteLine("Код товара: " + BitConverter.ToUInt64(buf, 24));
-                    Console.WriteLine("Наименование товара: " + Encoding.Default.GetString(buf, 44, 32));
-                    Console.WriteLine("Цена за еденицу(кг.): " + Convert.ToDouble(BitConverter.ToUInt32(buf, 8)) / 100);
-                    Console.WriteLine("Количество товара: " + Convert.ToDouble(BitConverter.ToUInt32(buf, 40)) / 1000);
-                    Console.WriteLine("Сумма: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100);
-                }
-                else if (buf[0] == 04)
-                {
-                    if (buf[8] == 01)
+                    string s = ASCIIEncoding.ASCII.GetString(answer, 8, answerlenght - 9);
+                    byte[] buf = Convert.FromBase64String(s); // расшифровонная строка
+                    Console.WriteLine(BitConverter.ToString(buf));
+                    
+                    if (buf[0] == 99) // Начало чека
                     {
-                        if (buf[6] == 01)
+                        c = new Check(DateTime.Now, 73);
+                    }
+                    else if (buf[0] == 01 && c != null) // Продажа
+                    {
+                        uint code = BitConverter.ToUInt32(buf, 24); // код товара
+                        string name = Encoding.Default.GetString(buf, 44, 32); // название товара
+                        double price = Convert.ToDouble(BitConverter.ToUInt32(buf, 8)) / 100; // цена
+                        double quantity = Convert.ToDouble(BitConverter.ToUInt32(buf, 40)) / 1000; // количество
+                        double sum = Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100; // сумма
+                        c.AddGood(code, price, quantity, sum); // добавляем товар в чек
+                    }
+                    else if (buf[0] == 04) // скидка надбавка
+                    {
+                        if (buf[8] == 01) // на промежуточьный итог
                         {
-                            Console.WriteLine("Процент надбавки на промежуточный итог: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100);
+                            if (buf[6] == 01) // надбавка
+                            {
+                                double proc =  Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
+                                // надбавка на на все товары чека до текущего момента
+                                foreach(Good g in  c.goods)
+                                {
+                                    g.discSurc = proc;
+                                }
+                            }
+                            else if (buf[6] == 02) // скидка
+                            {
+                                double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
+                                // скидка на на все товары чека до текущего момента
+                                foreach (Good g in c.goods) //  
+                                {
+                                    g.discSurc = proc;
+                                }
+                            }
                         }
-                        else if (buf[6] == 02)
+                        else // на товар
                         {
-                            Console.WriteLine("Процент скидки на промежуточный итог: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100);
+                            if (buf[6] == 01) // надбавка
+                            {
+                                double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
+                                // надбавка на последний товар, на текущий момент.
+                                c.goods.Last<Good>().discSurc = proc;
+                            }
+                            else if (buf[6] == 02) // скидка
+                            {
+                                double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
+                                // скидка на последний товар, на текущий момент.
+                                c.goods.Last<Good>().discSurc = proc;
+                            }
                         }
                     }
-                    else
+                    else if (buf[0] == 03) // Оплата
                     {
-                        if (buf[6] == 01)
-                        {
-                            Console.WriteLine("Процент надбавки на прошлую позицию: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100);
-                        }
-                        else if (buf[6] == 02)
-                        {
-                            Console.WriteLine("Процент скидки на прошлую позицию: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100);
-                        }
+                        Console.WriteLine("Вид оплаты: " + buf[4].ToString());
+                        Console.WriteLine("Сумма оплаты: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100);
                     }
                 }
-                else if (buf[0] == 03) // Оплата
-                {
-                    Console.WriteLine("Вид оплаты: " + buf[4].ToString());
-                    Console.WriteLine("Сумма оплаты: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100);
-                }
-
-                return ""; 
+                return null;
             }
             return null;
         }
