@@ -26,7 +26,7 @@ namespace ConsoleApplication1
             int doc = ecr.GetLastDocNumber();
             
 
-            Console.WriteLine(ecr.ReadDoc(doc));
+            Check c = ecr.ReadDoc(doc);
 
             //for (int i = 65; i <= ecr.GetLastDocNumber(); ++i)
             //{

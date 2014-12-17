@@ -25,7 +25,7 @@ namespace Delphin
 
 
 #region Public Field
-        public PLU plu = new PLU();
+
 #endregion Public Field
 
 
@@ -140,7 +140,7 @@ namespace Delphin
             return Send(sendBytes);
         }
 
-        public bool ReadPlu(int pluCode)
+        public PLU ReadPlu(int pluCode)
         {                                                             // R
                                                        //31h 30h 37h 09h 52h 09h  
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 82, 09 };
@@ -148,6 +148,7 @@ namespace Delphin
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
             if(Send(sendBytes) && answerlenght > 8)
             {
+                PLU plu = new PLU();
                 List<string> lPlu = Separating();
                 plu.Code = Convert.ToInt32(lPlu[0]);
                 plu.TaxGr = Convert.ToByte(lPlu[1]);
@@ -164,9 +165,9 @@ namespace Delphin
                 plu.Bar4 = lPlu[12];
                 plu.Name = lPlu[13];
                 plu.ConnectedPLU = Convert.ToInt32(lPlu[14]);
-               return true;
+               return plu;
             }
-            return false;
+            return null;
         }
 
         public bool DeletingPlu(int firstPlu, int lastPlu)
@@ -366,6 +367,107 @@ namespace Delphin
             return null;
         }
 
+        /// <summary>
+        /// Возвращает объект типа Delphin.Check заданного документа.
+        /// </summary>
+        /// <param name="docNumber"></param>
+        /// <returns>Chech - объект чека, или null</returns>
+        public Check ReadDoc(int docNumber)
+        {// 125 | 1 | docNum
+            if (SetDocForRead(docNumber))
+            {
+                byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 50, 09 };
+                sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
+                sendBytes = sendBytes.Concat(SEP).ToArray();
+                Check c = null;
+                while (Send(sendBytes))
+                {
+                    string s = ASCIIEncoding.ASCII.GetString(answer, 8, answerlenght - 9);
+                    byte[] buf = Convert.FromBase64String(s); // расшифровонная строка
+                    Console.WriteLine(BitConverter.ToString(buf));
+
+                    if (buf[0] == 99) // Начало чека
+                    {
+                        c = new Check(DateTime.Now, 73);
+                    }
+                    else if (buf[0] == 01 && c != null) // Продажа
+                    {
+                        uint code = BitConverter.ToUInt32(buf, 24); // код товара
+                        string name = Encoding.Default.GetString(buf, 44, 32); // название товара
+                        double price = Convert.ToDouble(BitConverter.ToUInt32(buf, 8)) / 100; // цена
+                        double quantity = Convert.ToDouble(BitConverter.ToUInt32(buf, 40)) / 1000; // количество
+                        double sum = Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100; // сумма
+                        c.AddGood(code, price, quantity, sum, name); // добавляем товар в чек
+                    }
+                    else if (buf[0] == 04) // скидка надбавка
+                    {
+                        if (buf[8] == 01) // на промежуточьный итог
+                        {
+                            if (buf[6] == 01) // надбавка
+                            {
+                                double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
+                                // надбавка на на все товары чека до текущего момента
+                                foreach (Good g in c.goods)
+                                {
+                                    g.discSurc = proc;
+                                }
+                            }
+                            else if (buf[6] == 02) // скидка
+                            {
+                                double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
+                                // скидка на на все товары чека до текущего момента
+                                foreach (Good g in c.goods) //  
+                                {
+                                    g.discSurc = proc;
+                                }
+                            }
+                        }
+                        else // на товар
+                        {
+                            if (buf[6] == 01) // надбавка
+                            {
+                                double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
+                                // надбавка на последний товар, на текущий момент.
+                                c.goods.Last<Good>().discSurc = proc;
+                            }
+                            else if (buf[6] == 02) // скидка
+                            {
+                                double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
+                                // скидка на последний товар, на текущий момент.
+                                c.goods.Last<Good>().discSurc = proc;
+                            }
+                        }
+                    }
+                    else if (buf[0] == 03) // Оплата
+                    {
+                        byte type = buf[4];
+                        double pay = Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100;
+                        double change = Convert.ToDouble(BitConverter.ToUInt64(buf, 24)) / 100;
+                        c.AddPayment(type, pay, change);
+                    }
+                }
+                return c; // Возврат Чека
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Возвращает оодну стоку заданного документа документа за вызов
+        /// </summary>
+        /// <param name="docNumber"></param>
+        /// <returns>string - одна строка из документа</returns>
+        public string ReadDocStr(int docNumber)
+        {// 125 | 1 | docNum
+            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 49, 09 };
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            if (Send(sendBytes))
+            {
+                return Encoding.Default.GetString(answer, 7, answerlenght - 8);
+            }
+            return null;
+        }
+
 #endregion Public methods
 
 
@@ -443,7 +545,7 @@ namespace Delphin
         /// </summary>
         /// <param name="docNumber"></param>
         /// <returns>bool</returns>
-        public bool SetDocForRead(int docNumber)
+        private bool SetDocForRead(int docNumber)
         {// 125 | 1 | docNum
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 48, 09};
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
@@ -453,105 +555,6 @@ namespace Delphin
                 return true;
             }
             return false;
-        }
-
-        /// <summary>
-        /// Возвращает оодну стоку заданного документа документа за вызов
-        /// </summary>
-        /// <param name="docNumber"></param>
-        /// <returns>string - одна строка из документа</returns>
-        public string ReadDocStr(int docNumber)
-        {// 125 | 1 | docNum
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 49, 09 };
-            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
-            sendBytes = sendBytes.Concat(SEP).ToArray();
-            if (Send(sendBytes))
-            {
-                return Encoding.Default.GetString(answer, 7, answerlenght-8);
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Возвращает оодну стоку заданного документа документа за вызов
-        /// </summary>
-        /// <param name="docNumber"></param>
-        /// <returns>string - одна строка из документа</returns>
-        public string ReadDoc(int docNumber)
-        {// 125 | 1 | docNum
-            if (SetDocForRead(docNumber))
-            {
-                byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 50, 09 };
-                sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
-                sendBytes = sendBytes.Concat(SEP).ToArray();
-                Check c = null;
-                while(Send(sendBytes))
-                {
-                    string s = ASCIIEncoding.ASCII.GetString(answer, 8, answerlenght - 9);
-                    byte[] buf = Convert.FromBase64String(s); // расшифровонная строка
-                    Console.WriteLine(BitConverter.ToString(buf));
-                    
-                    if (buf[0] == 99) // Начало чека
-                    {
-                        c = new Check(DateTime.Now, 73);
-                    }
-                    else if (buf[0] == 01 && c != null) // Продажа
-                    {
-                        uint code = BitConverter.ToUInt32(buf, 24); // код товара
-                        string name = Encoding.Default.GetString(buf, 44, 32); // название товара
-                        double price = Convert.ToDouble(BitConverter.ToUInt32(buf, 8)) / 100; // цена
-                        double quantity = Convert.ToDouble(BitConverter.ToUInt32(buf, 40)) / 1000; // количество
-                        double sum = Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100; // сумма
-                        c.AddGood(code, price, quantity, sum); // добавляем товар в чек
-                    }
-                    else if (buf[0] == 04) // скидка надбавка
-                    {
-                        if (buf[8] == 01) // на промежуточьный итог
-                        {
-                            if (buf[6] == 01) // надбавка
-                            {
-                                double proc =  Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
-                                // надбавка на на все товары чека до текущего момента
-                                foreach(Good g in  c.goods)
-                                {
-                                    g.discSurc = proc;
-                                }
-                            }
-                            else if (buf[6] == 02) // скидка
-                            {
-                                double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
-                                // скидка на на все товары чека до текущего момента
-                                foreach (Good g in c.goods) //  
-                                {
-                                    g.discSurc = proc;
-                                }
-                            }
-                        }
-                        else // на товар
-                        {
-                            if (buf[6] == 01) // надбавка
-                            {
-                                double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
-                                // надбавка на последний товар, на текущий момент.
-                                c.goods.Last<Good>().discSurc = proc;
-                            }
-                            else if (buf[6] == 02) // скидка
-                            {
-                                double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
-                                // скидка на последний товар, на текущий момент.
-                                c.goods.Last<Good>().discSurc = proc;
-                            }
-                        }
-                    }
-                    else if (buf[0] == 03) // Оплата
-                    {
-                        Console.WriteLine("Вид оплаты: " + buf[4].ToString());
-                        Console.WriteLine("Сумма оплаты: " + Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100);
-                    }
-                }
-                return null;
-            }
-            return null;
         }
 
         /// <summary>
