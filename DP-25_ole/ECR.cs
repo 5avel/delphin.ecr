@@ -265,7 +265,6 @@ namespace Delphin
 
             if (Send(sendBytes))
             {
-
                 return Encoding.Default.GetString(answer, 7, 30);
             }
             return null;

@@ -9,8 +9,7 @@ namespace ConsoleApplication1
     {/// test comita
         static void Main(string[] args)
         {
-            Сheck ch1 = new Сheck();
-            ch1.PaymentList
+            
 
 
             ECR ecr = new ECR();
