@@ -387,11 +387,18 @@ namespace Delphin
                 {
                     string s = ASCIIEncoding.ASCII.GetString(answer, 8, answerlenght - 9);
                     byte[] buf = Convert.FromBase64String(s); // расшифровонная строка
-                    Console.WriteLine(BitConverter.ToString(buf));
+                    Console.WriteLine(BitConverter.ToString(buf)+"\n");
 
                     if (buf[0] == 99) // Начало чека
                     {
-                        c = new Check(DateTime.Now, 73);
+                        if (buf[4] == 0) // Чек
+                        {
+                            c = new Check(DateTime.Now, BitConverter.ToUInt32(buf, 8));
+                        }
+                        else if (buf[4] == 1) // Возвратный Чек
+                        {
+                            c = new Check(DateTime.Now, BitConverter.ToUInt32(buf, 8), true);
+                        }
                     }
                     else if (buf[0] == 01 && c != null) // Продажа
                     {
@@ -440,6 +447,15 @@ namespace Delphin
                                 c.goods.Last<Good>().discSurc = proc;
                             }
                         }
+                    }
+                    else if (buf[0] == 08) // Корекция, Отмена внутри чека
+                    {
+                        uint code = BitConverter.ToUInt32(buf, 24); // код товара
+                        string name = Encoding.Default.GetString(buf, 44, 32); // название товара
+                        double price = Convert.ToDouble(BitConverter.ToUInt32(buf, 8)) / 100; // цена
+                        double quantity = Convert.ToDouble(BitConverter.ToUInt32(buf, 40)) / 1000; // количество
+                        double sum = Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100; // сумма
+                        c.AddGood(code, price, -quantity, -sum, name, true);
                     }
                     else if (buf[0] == 03) // Оплата
                     {

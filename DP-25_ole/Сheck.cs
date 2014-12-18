@@ -11,8 +11,9 @@ namespace Delphin
         public double sum { get; set; }
         public double discSurc { get; set; }
         public string name { get; set; }
+        public bool isCanceled { get; set; }
 
-        internal Good(uint code, double price, double quantity, double sum, string name)
+        internal Good(uint code, double price, double quantity, double sum, string name, bool isCanceled)
         {
             this.code = code;
             this.price = price;
@@ -20,6 +21,7 @@ namespace Delphin
             this.sum = sum;
             this.discSurc = 0;
             this.name = name;
+            this.isCanceled = isCanceled;
         }
 
     }
@@ -45,20 +47,22 @@ namespace Delphin
     {
         public DateTime dateTime { get; set; }
         public uint num { get; set; }
+        public bool isReturnCheck { get; set; }
         public Collection<Good> goods { get; set; }
         public Collection<Payment> payments { get; set; }
 
-        internal Check(DateTime dt, uint num)
+        internal Check(DateTime dt, uint num, bool isReturnCheck = false)
         {
             this.dateTime = dt;
             this.num = num;
+            this.isReturnCheck = isReturnCheck;
             this.goods = new Collection<Good>();
             this.payments = new Collection<Payment>();
         }
 
-        public void AddGood(uint code, double price, double quantity, double sum, string name)
+        public void AddGood(uint code, double price, double quantity, double sum, string name, bool isCanceled = false)
         {
-            Good g = new Good(code, price, quantity, sum, name);
+            Good g = new Good(code, price, quantity, sum, name, isCanceled);
             this.goods.Add(g);
         }
 

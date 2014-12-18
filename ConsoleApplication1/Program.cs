@@ -23,10 +23,12 @@ namespace ConsoleApplication1
             //{
             //     Console.WriteLine(s);
             //}
-            int doc = ecr.GetLastDocNumber()-1;
+            int doc = ecr.GetLastDocNumber();
             
 
             Check c = ecr.ReadDoc(doc);
+            Console.WriteLine("Номер чека -"+c.num);
+            Console.WriteLine("Чек возврата? -" + c.isReturnCheck);
             Console.WriteLine(c.goods[0].name);
 
             ////for (int i = 65; i <= ecr.GetLastDocNumber(); ++i)
