@@ -3,14 +3,14 @@ using System.Collections.ObjectModel;
 
 namespace Delphin
 {
-    internal class Good
+    public class Good
     {
-        internal uint code { get; set; }
-        internal double price { get; set; }
-        internal double quantity { get; set; }
-        internal double sum { get; set; }
-        internal double discSurc { get; set; }
-        internal string name { get; set; }
+        public uint code { get; set; }
+        public double price { get; set; }
+        public double quantity { get; set; }
+        public double sum { get; set; }
+        public double discSurc { get; set; }
+        public string name { get; set; }
 
         internal Good(uint code, double price, double quantity, double sum, string name)
         {
@@ -21,14 +21,15 @@ namespace Delphin
             this.discSurc = 0;
             this.name = name;
         }
+
     }
 
-    internal class Payment
+    public class Payment
     {
-        private byte type { get; set; }
-        private double pay { get; set; }
-        private double change { get; set; }
-        private double sum { get; set; }
+        public byte type { get; set; }
+        public double pay { get; set; }
+        public double change { get; set; }
+        public double sum { get; set; }
 
         internal Payment(byte type, double pay, double change)
         {
@@ -42,10 +43,10 @@ namespace Delphin
 
     public class Check
     {
-        internal DateTime dateTime { get; set; }
-        internal uint num { get; set; }
-        internal Collection<Good> goods { get; set; }
-        internal Collection<Payment> payments { get; set; }
+        public DateTime dateTime { get; set; }
+        public uint num { get; set; }
+        public Collection<Good> goods { get; set; }
+        public Collection<Payment> payments { get; set; }
 
         internal Check(DateTime dt, uint num)
         {

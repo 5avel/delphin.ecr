@@ -12,32 +12,61 @@ namespace ConsoleApplication1
             
 
 
-            ECR ecr = new ECR();
-            Console.WriteLine("Connect - " + ecr.Connect("192.168.88.53", 5999, 1).ToString());
+            //ECR ecr = new ECR();
+            //Console.WriteLine("Connect - " + ecr.Connect("192.168.88.53", 5999, 1).ToString());
 
-            //Console.WriteLine(" last - " + ecr.GetLastDocNumber());
+            ////Console.WriteLine(" last - " + ecr.GetLastDocNumber());
 
-            //ecr.GetDateDocByDocNum(ecr.GetLastDocNumber());
-            //var doc = ecr.GetDocTxtByNum(ecr.GetLastDocNumber());
-            //foreach (string s in doc)
-            //{
-            //     Console.WriteLine(s);
-            //}
-            int doc = ecr.GetLastDocNumber();
+            ////ecr.GetDateDocByDocNum(ecr.GetLastDocNumber());
+            ////var doc = ecr.GetDocTxtByNum(ecr.GetLastDocNumber());
+            ////foreach (string s in doc)
+            ////{
+            ////     Console.WriteLine(s);
+            ////}
+            //int doc = ecr.GetLastDocNumber();
             
 
-            Check c = ecr.ReadDoc(doc);
+            //Check c = ecr.ReadDoc(doc);
+            //Console.WriteLine(c.goods[0].name);
 
-            //for (int i = 65; i <= ecr.GetLastDocNumber(); ++i)
+            ////for (int i = 65; i <= ecr.GetLastDocNumber(); ++i)
+            ////{
+            //var docStr = ecr.GetDocTxtByNum(doc);
+            //if (docStr != null)
             //{
-            var docStr = ecr.GetDocTxtByNum(doc);
-            if (docStr != null)
-            {
-                foreach (string s in docStr)
-                {
-                    Console.WriteLine(s);
-                }
-            }
+            //    foreach (string s in docStr)
+            //    {
+            //        Console.WriteLine(s);
+            //    }
+            //}
+            //Console.WriteLine("DisConnect - " + ecr.Disconnect().ToString());
+
+
+            // TEST ECRfor1C
+            ECRfor1C ecr1c = new ECRfor1C();
+            ecr1c.Connect("192.168.88.53", 5999, 1);
+
+            ecr1c.ReadArticul(1);
+            Console.WriteLine("ArtCode " + ecr1c.ArtCode);
+            Console.WriteLine("ArtName " + ecr1c.ArtName);
+            Console.WriteLine("ArtPrice " + ecr1c.ArtPrice);
+            Console.WriteLine("ArtQnty " + ecr1c.ArtQnty);
+            Console.WriteLine("ArtDep " + ecr1c.ArtDep);
+            Console.WriteLine("ArtGrp " + ecr1c.ArtGrp);
+            Console.WriteLine("ArtTax " + ecr1c.ArtTax);
+            Console.WriteLine("ArtNC " + ecr1c.ArtNC);
+            Console.WriteLine("ArtNK " + ecr1c.ArtNK);
+            Console.WriteLine("ArtBarCode " + ecr1c.ArtBarCode);
+            Console.WriteLine("ArtSaleQnty " + ecr1c.ArtSaleQnty);
+            Console.WriteLine("ArtSaleSum " + ecr1c.ArtSaleSum);
+
+            
+            
+      
+
+
+            ecr1c.Disconnect();
+
             //}
             
 
@@ -90,7 +119,7 @@ namespace ConsoleApplication1
 
             //Console.WriteLine("SetDocForRead(49) - " + ecr.SetDocForRead(49).ToString());
 
-            Console.WriteLine("DisConnect - " + ecr.Disconnect().ToString());
+            
             //byte[] b = {242, 05, 00, 00, 00, 00, 00, 00 };
             //Console.WriteLine(BitConverter.ToUInt64(b, 0)); // Код товара
 

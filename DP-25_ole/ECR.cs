@@ -8,27 +8,8 @@ using System.Linq;
 namespace Delphin
 {
     [Guid("a0cc9128-46fc-4bf7-a2b8-76d1e81ae686"), ClassInterface(ClassInterfaceType.None), ComSourceInterfaces(typeof(IEvents))]
-    public class ECR : IECR
+    public partial class ECR : IECR
     {
-
-#region Private Field
-        private TcpClient client = null;
-        private NetworkStream tcpStream = null;
-        private byte logNum = 0;
-        private byte[] SEP = {9};
-        private byte[] answer = new byte[256];
-        private int answerlenght = 0;
-
- 
-#endregion Private Field
-
-
-
-#region Public Field
-
-#endregion Public Field
-
-
 
 #region Public methods
 
@@ -132,6 +113,8 @@ namespace Delphin
 
         public bool Beep(int tone, int len)
         {
+            if (client.Connected == false) return false; // состояние соединенияя
+
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 56, 48, 09 };
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(tone.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
@@ -141,7 +124,9 @@ namespace Delphin
         }
 
         public PLU ReadPlu(int pluCode)
-        {                                                             // R
+        {
+            if (client.Connected == false) return null; // состояние соединенияя
+                                                                       // R
                                                        //31h 30h 37h 09h 52h 09h  
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 82, 09 };
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(pluCode.ToString())).ToArray(); // 31h
@@ -171,7 +156,9 @@ namespace Delphin
         }
 
         public bool DeletingPlu(int firstPlu, int lastPlu)
-        {                                                             // D
+        {
+            if (client.Connected == false) return false; // состояние соединенияя
+                                                                       // D
                                                        //31h 30h 37h 09h 44h 09h  
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 68, 09 };
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(firstPlu.ToString())).ToArray();
@@ -192,7 +179,9 @@ namespace Delphin
 
         public bool WritePlu(   int plu, byte taxGr, byte dep, byte group, byte priceType, double price, double addQty,
                                 double quantity, string bar1, string bar2, string bar3, string bar4, string name, int connectedPLU)
-        {                                                             // P
+        {
+            if (client.Connected == false) return false; // состояние соединенияя
+                                                                       // P
                                                        //31h 30h 37h 09h 50h 09h  
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 80, 09 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(plu.ToString())).ToArray();
@@ -260,7 +249,9 @@ namespace Delphin
         }
 
         public string GetDataTime()
-        {                                                             // D
+        {
+            if (client.Connected == false) return null; // состояние соединенияя
+
             //31h 30h 37h 09h 44h 09h  
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 54, 50, 09};
 
@@ -277,7 +268,9 @@ namespace Delphin
         /// <param name="dstsTime">DateTime - Date and time in format: DD-MM-YY<SPACE>hh:mm:ss<SPACE>DST</param>
         /// <returns></returns>
         public bool SetDataTime(string dataTime)
-        {                                                             // D
+        {
+            if (client.Connected == false) return false; // состояние соединенияя           
+ 
             //31h 30h 37h 09h 44h 09h  
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 54, 49, 09 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dataTime)).ToArray();
@@ -296,6 +289,8 @@ namespace Delphin
         /// <returns> int - номер документа.</returns>
         public int GetLastDocNumber()
         {
+            if (client.Connected == false) return 0; // состояние соединенияя
+
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 52, 09, 09, 09};
 
             if (Send(sendBytes))
@@ -320,6 +315,8 @@ namespace Delphin
         /// <returns></returns>
         public int GetFirstDocNumberByDate(string date)
         {
+            if (client.Connected == false) return 0; // состояние соединенияя
+
             // Проверка даты.
             int maxDocNum = GetLastDocNumber();
             return 0;
@@ -332,6 +329,8 @@ namespace Delphin
         /// <returns>Список строк документа. В случаее ошибки вернет NULL.</returns>
         public List<string> GetDocTxtByNum(int num)
         {
+            if (client.Connected == false) return null; // состояние соединенияя
+
             List<string> ekl = new List<string>();
             if(SetDocForRead(num))
             {
@@ -353,6 +352,8 @@ namespace Delphin
         /// <returns>Список строк документа. В случаее ошибки вернет NULL.</returns>
         public List<string> GetDocByNum(int num)
         {
+            if (client.Connected == false) return null; // состояние соединенияя
+
             List<string> ekl = new List<string>();
             if (SetDocForRead(num))
             {
@@ -374,6 +375,8 @@ namespace Delphin
         /// <returns>Chech - объект чека, или null</returns>
         public Check ReadDoc(int docNumber)
         {// 125 | 1 | docNum
+            if (client.Connected == false) return null; // состояние соединенияя
+
             if (SetDocForRead(docNumber))
             {
                 byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 50, 09 };
@@ -458,6 +461,8 @@ namespace Delphin
         /// <returns>string - одна строка из документа</returns>
         public string ReadDocStr(int docNumber)
         {// 125 | 1 | docNum
+            if (client.Connected == false) return null; // состояние соединенияя
+
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 49, 09 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
@@ -469,113 +474,6 @@ namespace Delphin
         }
 
 #endregion Public methods
-
-
-
-#region Privat methods
-
-        /// <summary>
-        /// Метод отправляет массив байт и обрабатывает ответ.
-        /// </summary>
-        /// <param name="sendBytes"> Массив байт для отправки.</param>
-        /// <returns></returns>
-        private bool Send(byte[] sendBytes)
-        {
-            if (client.Connected)
-            {
-                byte[] leng = { Convert.ToByte(sendBytes.Length) };
-                sendBytes = leng.Concat(sendBytes).ToArray();
-                tcpStream.Write(sendBytes, 0, sendBytes.Length);
-                byte[] bytes = new byte[client.ReceiveBufferSize];
-                int bytesRead = tcpStream.Read(bytes, 0, client.ReceiveBufferSize);
-                if (bytesRead > 0)
-                {
-                    if (bytes[6] == 80)
-                    {
-                        // answer = BitConverter.ToString(bytes, 0, bytesRead);
-                        answer = bytes;
-                        answerlenght = bytesRead;
-                        return true;
-                    }
-                    else if (bytes[6] == 70)
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Преабразует массив byte находящийся в переменной ansfer - массив строк
-        /// </summary>
-        /// <returns>Массив строк.</returns>
-        private List<string> Separating()
-        {
-            List<string> lStr = new List<string>();
-            String temp = String.Empty;
-            for (int i = 8; i < answerlenght; i++) // перебор массива ответа
-            {
-                if (answer[i] != 09) // не встретили сепаратор
-                {
-                    temp += ASCIIEncoding.Default.GetString(answer, i, 1);
-                }
-                else // втретили сепаратор - значит конец строки. 
-                {
-                    lStr.Add(temp);
-                    temp = String.Empty;      
-                }
-            }
-            return lStr;
-        }
-
-        /// <summary>
-        /// задает документ для чтения
-        /// </summary>
-        /// <param name="docNumber"></param>
-        /// <returns>bool</returns>
-        private bool SetDocForRead(int docNumber)
-        {// 125 | 1 | docNum
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 48, 09};
-            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
-            sendBytes = sendBytes.Concat(SEP).ToArray();
-            if (Send(sendBytes))
-            {
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Возвращает дату документа с заданным номером.
-        /// </summary>
-        /// <param name="docNumber">Номер документа.</param>
-        /// <returns>DateTime - Дата документа.</returns>
-        private DateTime GetDateDocByDocNum(int docNumber)
-        {
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 48, 09 };
-            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
-            sendBytes = sendBytes.Concat(SEP).ToArray();
-            if (Send(sendBytes))
-            {
-                List<string> lStr = Separating();
-                return DateTime.Parse(lStr[1]);
-            }
-            return DateTime.MinValue;
-        }
-
-#endregion Privat methods
 
     } // class ECR
 } // namespace DP_25_ole
