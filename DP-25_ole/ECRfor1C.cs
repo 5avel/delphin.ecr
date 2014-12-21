@@ -154,5 +154,10 @@ namespace Delphin
         }
 
 
+        public bool Beep(int Tone, int Leng)
+        {
+            return ecr.Beep(Tone, Leng);
+        }
+
     }
 }
