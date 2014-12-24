@@ -50,6 +50,7 @@ namespace Delphin
         public bool isReturnCheck { get; set; }
         public Collection<Good> goods { get; set; }
         public Collection<Payment> payments { get; set; }
+        public double discSurc { get; set; }
 
         internal Check(DateTime dt, uint num, bool isReturnCheck = false)
         {

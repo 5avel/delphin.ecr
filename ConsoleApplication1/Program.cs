@@ -27,10 +27,12 @@ namespace ConsoleApplication1
             
 
             Check c = ecr.ReadDoc(doc);
-            Console.WriteLine("Номер чека -"+c.num);
-            Console.WriteLine("Чек возврата? -" + c.isReturnCheck);
-            Console.WriteLine(c.goods[0].name);
-
+            if (c != null)
+            {
+                Console.WriteLine("Номер чека -" + c.num);
+                Console.WriteLine("Чек возврата? -" + c.isReturnCheck);
+                Console.WriteLine(c.goods[0].name);
+            }
             ////for (int i = 65; i <= ecr.GetLastDocNumber(); ++i)
             ////{
             var docStr = ecr.GetDocTxtByNum(doc);
@@ -41,6 +43,9 @@ namespace ConsoleApplication1
                     Console.WriteLine(s);
                 }
             }
+
+            ecr.GetFirstDocNumberByDate("23-12-14");
+
             Console.WriteLine("DisConnect - " + ecr.Disconnect().ToString());
 
 

@@ -319,6 +319,27 @@ namespace Delphin
 
             // Проверка даты.
             int maxDocNum = GetLastDocNumber();
+
+            DateTime dt;
+            
+            DateTime dtIn = DateTime.Parse(date);
+            DateTime dtOut = DateTime.Parse(date+" 23:59:59");
+            
+
+            for (int i = maxDocNum; i > 0; i--)
+            {
+                dt = GetDateDocByDocNum(i);
+                if (dt > dtIn & dt < dtOut)
+                {
+                    Console.WriteLine(" Конец "+dt.ToString());
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine(dt.ToString());
+                }
+            }
+
             return 0;
         }
 
@@ -345,28 +366,6 @@ namespace Delphin
             return null;            
         }
 
-        /// <summary>
-        /// Возвращает заданный документ в текстовом виде.
-        /// </summary>
-        /// <param name="num">Номер документа.</param>
-        /// <returns>Список строк документа. В случаее ошибки вернет NULL.</returns>
-        public List<string> GetDocByNum(int num)
-        {
-            if (client.Connected == false) return null; // состояние соединенияя
-
-            List<string> ekl = new List<string>();
-            if (SetDocForRead(num))
-            {
-                string s = ReadDocStr(num);
-                while (s != null)
-                {
-                    ekl.Add(s);
-                    s = ReadDocStr(num);
-                }
-                return ekl;
-            }
-            return null;
-        }
 
         /// <summary>
         /// Возвращает объект типа Delphin.Check заданного документа.
@@ -411,25 +410,19 @@ namespace Delphin
                     }
                     else if (buf[0] == 04) // скидка надбавка
                     {
-                        if (buf[8] == 01) // на промежуточьный итог
+                        if (buf[8] == 01) // на Весь Чек
                         {
                             if (buf[6] == 01) // надбавка
                             {
                                 double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
-                                // надбавка на на все товары чека до текущего момента
-                                foreach (Good g in c.goods)
-                                {
-                                    g.discSurc = proc;
-                                }
+                                // надбавка на Весь Чек  
+                                c.discSurc = proc; 
                             }
                             else if (buf[6] == 02) // скидка
                             {
                                 double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
-                                // скидка на на все товары чека до текущего момента
-                                foreach (Good g in c.goods) //  
-                                {
-                                    g.discSurc = proc;
-                                }
+                                // скидка на Весь Чек
+                                c.discSurc = -proc;
                             }
                         }
                         else // на товар
@@ -444,7 +437,7 @@ namespace Delphin
                             {
                                 double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
                                 // скидка на последний товар, на текущий момент.
-                                c.goods.Last<Good>().discSurc = proc;
+                                c.goods.Last<Good>().discSurc = -proc;
                             }
                         }
                     }
@@ -463,6 +456,30 @@ namespace Delphin
                         double pay = Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100;
                         double change = Convert.ToDouble(BitConverter.ToUInt64(buf, 24)) / 100;
                         c.AddPayment(type, pay, change);
+                    }
+                    else if(buf[0] == 10) // Отмена скидки надбавки на весь чек
+                    {
+                        if (buf[8] == 01) // на Весь Чек
+                        {
+                            if (buf[6] == 01) // надбавка
+                            {
+                                double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
+                                // надбавка на на все товары чека до текущего момента
+                                foreach (Good g in c.goods)
+                                {
+                                    g.discSurc -= proc; // отнимаем надбавку от каждого товара
+                                }
+                            }
+                            else if (buf[6] == 02) // скидка
+                            {
+                                double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
+                                // скидка на на все товары чека до текущего момента
+                                foreach (Good g in c.goods) //  
+                                {
+                                    g.discSurc += proc; // отнимаем скидку от каждого товара
+                                }
+                            }
+                        }
                     }
                 }
                 return c; // Возврат Чека

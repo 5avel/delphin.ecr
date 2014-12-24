@@ -8,7 +8,7 @@ namespace Delphin
     public class ECRfor1C
     {
         private ECR ecr;
-        public ECRfor1C()
+        public ECRfor1C()  // Реализовать сингтон
         {
             ecr = new ECR();
         }
