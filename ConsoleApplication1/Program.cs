@@ -23,28 +23,34 @@ namespace ConsoleApplication1
             //{
             //     Console.WriteLine(s);
             //}
-            int doc = ecr.GetLastDocNumber();
-            
+            //int doc = ecr.GetLastDocNumber();
+            //int doc = 88;
 
-            Check c = ecr.ReadDoc(doc);
-            if (c != null)
-            {
-                Console.WriteLine("Номер чека -" + c.num);
-                Console.WriteLine("Чек возврата? -" + c.isReturnCheck);
-                Console.WriteLine(c.goods[0].name);
-            }
-            ////for (int i = 65; i <= ecr.GetLastDocNumber(); ++i)
-            ////{
-            var docStr = ecr.GetDocTxtByNum(doc);
-            if (docStr != null)
-            {
-                foreach (string s in docStr)
-                {
-                    Console.WriteLine(s);
-                }
-            }
+            //Check c = ecr.ReadDoc(doc);
+            //if (c != null)
+            //{
+            //    Console.WriteLine("Номер чека -" + c.num);
+            //    Console.WriteLine("Чек возврата? -" + c.isReturnCheck);
+            //    Console.WriteLine(c.goods[0].name);
+            //}
+            //////for (int i = 65; i <= ecr.GetLastDocNumber(); ++i)
+            //////{
+            //var docStr = ecr.GetDocTxtByNum(doc);
+            //if (docStr != null)
+            //{
+            //    foreach (string s in docStr)
+            //    {
+            //        Console.WriteLine(s);
+            //    }
+            //}
 
-            ecr.GetFirstDocNumberByDate("23-12-14");
+             //for (int i = ecr.GetLastDocNumber(); i > 0; --i)
+             //{
+             //    Console.WriteLine(i+"  -  "+ecr.GetDateDocByDocNum(i));
+             //}
+
+
+            Console.WriteLine(ecr.GetFirstDocNumberByDate("17-10-14"));
 
             Console.WriteLine("DisConnect - " + ecr.Disconnect().ToString());
 

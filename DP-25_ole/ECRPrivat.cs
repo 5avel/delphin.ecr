@@ -111,7 +111,7 @@ namespace Delphin
         /// </summary>
         /// <param name="docNumber">Номер документа.</param>
         /// <returns>DateTime - Дата документа.</returns>
-        private DateTime GetDateDocByDocNum(int docNumber)
+        public DateTime GetDateDocByDocNum(int docNumber)
         {
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 48, 09 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
@@ -119,7 +119,8 @@ namespace Delphin
             if (Send(sendBytes))
             {
                 List<string> lStr = Separating();
-                return DateTime.Parse(lStr[1]);
+                var dt = DateTime.Parse(lStr[1].Remove(16));
+                return dt;
             }
             return DateTime.MinValue;
         }

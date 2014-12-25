@@ -316,31 +316,48 @@ namespace Delphin
         public int GetFirstDocNumberByDate(string date)
         {
             if (client.Connected == false) return 0; // состояние соединенияя
-
-            // Проверка даты.
             int maxDocNum = GetLastDocNumber();
-
             DateTime dt;
-            
-            DateTime dtIn = DateTime.Parse(date);
+            DateTime dtIn = DateTime.Parse(date+" 00:00:00");
             DateTime dtOut = DateTime.Parse(date+" 23:59:59");
-            
+            DateTime dtFirstDoc = GetDateDocByDocNum(1);
 
-            for (int i = maxDocNum; i > 0; i--)
+            if (dtFirstDoc < dtOut && dtFirstDoc > dtIn) // первый документ входит в диапозон
             {
-                dt = GetDateDocByDocNum(i);
-                if (dt > dtIn & dt < dtOut)
-                {
-                    Console.WriteLine(" Конец "+dt.ToString());
-                    break;
-                }
-                else
-                {
-                    Console.WriteLine(dt.ToString());
-                }
+                return 1;
             }
 
-            return 0;
+            if (dtFirstDoc > dtIn) // Поиск раньше первого документа
+            {
+                return 0;
+            }
+
+            int ret = 0;
+            int step = 10;
+            bool flag = true;
+            for (int i = maxDocNum; i >= 0; i -= step)
+            {
+                dt = GetDateDocByDocNum(i);
+                if (dt < dtIn)
+                {
+                    if (flag)
+                    {
+                        i += step;
+                        step = 1;
+                        flag = false;
+                    }
+                    else
+                    {
+                        dt = GetDateDocByDocNum(i+1);
+                        if(dt < dtOut && dt > dtIn)
+                        {
+                            ret = i + 1;
+                        }
+                        break;
+                    }
+                }
+            }
+            return ret;
         }
 
         /// <summary>
