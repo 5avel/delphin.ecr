@@ -11,9 +11,9 @@ namespace Delphin
         public double sum { get; set; }
         public double discSurc { get; set; }
         public string name { get; set; }
-        public bool isCanceled { get; set; }
+        public bool isVoid { get; set; }
 
-        internal Good(uint code, double price, double quantity, double sum, string name, bool isCanceled)
+        internal Good(uint code, double price, double quantity, double sum, string name, bool isVoid)
         {
             this.code = code;
             this.price = price;
@@ -21,7 +21,7 @@ namespace Delphin
             this.sum = sum;
             this.discSurc = 0;
             this.name = name;
-            this.isCanceled = isCanceled;
+            this.isVoid = isVoid;
         }
 
     }

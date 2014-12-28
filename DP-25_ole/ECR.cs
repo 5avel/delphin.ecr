@@ -309,29 +309,26 @@ namespace Delphin
         }
 
         /// <summary>
-        /// Возвращает номер первого документа на заданную дату.
+        /// Возвращает номер первого документа на заданный диапазон дат.
         /// </summary>
-        /// <param name="date">дата документа ДД-ММ-ГГ</param>
+        /// <param name="dateIn">DateTime - Date and time in format: DD-MM-YY<SPACE>hh:mm:ss</param>
+        /// <param name="dateOut">DateTime - Date and time in format: DD-MM-YY<SPACE>hh:mm:ss</param>
         /// <returns></returns>
-        public int GetFirstDocNumberByDate(string date)
+        public int GetFirstDocNumberByDate(string dateIn, string dateOut)
         {
             if (client.Connected == false) return 0; // состояние соединенияя
             int maxDocNum = GetLastDocNumber();
             DateTime dt;
-            DateTime dtIn = DateTime.Parse(date+" 00:00:00");
-            DateTime dtOut = DateTime.Parse(date+" 23:59:59");
+            DateTime dtIn = DateTime.Parse(dateIn);
+            DateTime dtOut = DateTime.Parse(dateOut);
             DateTime dtFirstDoc = GetDateDocByDocNum(1);
 
-            if (dtFirstDoc < dtOut && dtFirstDoc > dtIn) // первый документ входит в диапозон
-            {
-                return 1;
-            }
-
-            if (dtFirstDoc > dtIn) // Поиск раньше первого документа
-            {
-                return 0;
-            }
-
+            // первый документ входит в диапозон
+            if (dtFirstDoc < dtOut && dtFirstDoc > dtIn) return 1;
+            
+            // Поиск раньше первого документа
+            if (dtFirstDoc > dtIn) return 0;
+            
             int ret = 0;
             int step = 10;
             bool flag = true;
@@ -358,6 +355,16 @@ namespace Delphin
                 }
             }
             return ret;
+        }
+
+        /// <summary>
+        /// Возвращает номер первого документа на заданную дату.
+        /// </summary>
+        /// <param name="date">DateTime - Date and time in format: DD-MM-YY<SPACE>hh:mm:ss</param>
+        /// <returns></returns>
+        public int GetFirstDocNumberByDate(string date)
+        {
+            return GetFirstDocNumberByDate(date+" 00:00:00", date+" 23:59:59");
         }
 
         /// <summary>
@@ -389,12 +396,15 @@ namespace Delphin
         /// </summary>
         /// <param name="docNumber"></param>
         /// <returns>Chech - объект чека, или null</returns>
-        public Check ReadDoc(int docNumber)
+        public Check GetCheckByNum(int docNumber)
         {// 125 | 1 | docNum
             if (client.Connected == false) return null; // состояние соединенияя
 
             if (SetDocForRead(docNumber))
             {
+                List<string> lStr = Separating();
+                var dt = DateTime.Parse(lStr[1].Remove(16));
+
                 byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 50, 09 };
                 sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
                 sendBytes = sendBytes.Concat(SEP).ToArray();
@@ -403,17 +413,18 @@ namespace Delphin
                 {
                     string s = ASCIIEncoding.ASCII.GetString(answer, 8, answerlenght - 9);
                     byte[] buf = Convert.FromBase64String(s); // расшифровонная строка
-                    Console.WriteLine(BitConverter.ToString(buf)+"\n");
+                    //Console.WriteLine(BitConverter.ToString(buf)+"\n");
+                    
 
                     if (buf[0] == 99) // Начало чека
                     {
                         if (buf[4] == 0) // Чек
                         {
-                            c = new Check(DateTime.Now, BitConverter.ToUInt32(buf, 8));
+                            c = new Check(dt, BitConverter.ToUInt32(buf, 8));
                         }
                         else if (buf[4] == 1) // Возвратный Чек
                         {
-                            c = new Check(DateTime.Now, BitConverter.ToUInt32(buf, 8), true);
+                            c = new Check(dt, BitConverter.ToUInt32(buf, 8), true);
                         }
                     }
                     else if (buf[0] == 01 && c != null) // Продажа
@@ -465,7 +476,24 @@ namespace Delphin
                         double price = Convert.ToDouble(BitConverter.ToUInt32(buf, 8)) / 100; // цена
                         double quantity = Convert.ToDouble(BitConverter.ToUInt32(buf, 40)) / 1000; // количество
                         double sum = Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100; // сумма
-                        c.AddGood(code, price, -quantity, -sum, name, true);
+
+                        if(c.goods.Last().code == code)
+                        {
+                            c.goods.Last().isVoid = true;     // отменен                   
+                        }
+                        else
+                        {
+                            foreach(var g in c.goods)
+                            {
+                                if(g.code == code)
+                                {
+                                    g.isVoid = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        //c.AddGood(code, price, -quantity, -sum, name, true);
                     }
                     else if (buf[0] == 03) // Оплата
                     {

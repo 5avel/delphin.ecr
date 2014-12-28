@@ -154,6 +154,87 @@ namespace Delphin
         }
 
 
+        
+
+        private Check check = null;
+        //private int FirstCheckNum = 0;
+        private int CurentCheckNum = 0;
+        private int CurentCheckLine = 0;
+
+        /*
+        
+         *  JCheckNum – целое число, номер фискального чека
+            JCheckType – целое число, тип чека (1 – возвратный, 0 – чек продажи)
+            JCheckDate - строка, дата чека   
+            JCheckDis - вещественное число, процент скидки на весь Чек 0.00…99.99 (отрицательный - скидка, положительная – надбавка) 
+         * 
+            JArtCode – целое число, код артикула
+            JArtDep – целое число, номер отдела
+            JArtTax – целое число, номер налоговой группы
+            JArtGrp – целое число, номер товарной группы
+            JArtVoid – целое число, признак аннулирования товара (0-артикул продан, 1-артикул продан, а потом аннулирован)
+            JArtPrice – вещественное число, цена проданного артикула (без учета скидки)
+            JArtQnt – вещественное число, количество проданного артикула
+            JArtDis– – вещественное число, процент скидки на товар 0.00…99.99 (отрицательный - скидка, положительная – надбавка) 
+         */
+        public string DataSales { set; get; }
+
+        public uint JCheckNum { private set; get; }
+        public bool JCheckIsReturn { private set; get; }
+        public string JCheckDate { private set; get; }
+        public double JCheckDis { private set; get; }
+
+        public uint JArtCode { private set; get; }
+        public bool JArtVoid { private set; get; }
+        public double JArtPrice { private set; get; }
+        public double JArtQnt { private set; get; }
+        public double JArtSum { private set; get; }
+        public double JArtDis { private set; get; }
+        public string JArtName { private set; get; }
+
+        public bool ReadSales()
+        {
+            if(CurentCheckLine <= check.goods.Count-1)
+            {
+                //Заполняем переменные и увелисиваем счетчик
+                JArtCode = check.goods[CurentCheckLine].code;
+                JArtVoid = check.goods[CurentCheckLine].isVoid;
+                JArtPrice = check.goods[CurentCheckLine].price;
+                JArtQnt = check.goods[CurentCheckLine].quantity;
+                JArtSum = check.goods[CurentCheckLine].sum;
+                JArtDis = check.goods[CurentCheckLine].discSurc;
+                JArtName = check.goods[CurentCheckLine].name;
+
+                ++CurentCheckLine;
+                return true;
+            }
+            CurentCheckLine = 0;
+            return false;
+        }
+
+        public bool GetCheck()
+        {
+            if (CurentCheckNum == 0) // начало загрузки
+            {
+                int num = ecr.GetFirstDocNumberByDate(DataSales);
+                if (num > 0) CurentCheckNum = num;
+            }
+            check = ecr.GetCheckByNum(CurentCheckNum++);
+            if (check != null)
+            {
+                if (check.dateTime > DateTime.Parse(DataSales + " 23:59:59")) return false; // Чек старше дады
+
+                JCheckNum = check.num;
+                JCheckIsReturn = check.isReturnCheck;
+                JCheckDate = check.dateTime.ToString();
+                JCheckDis = check.discSurc;
+                
+                return true;
+            }
+            return false;
+        }
+        
+
         public bool Beep(int Tone, int Leng)
         {
             return ecr.Beep(Tone, Leng);

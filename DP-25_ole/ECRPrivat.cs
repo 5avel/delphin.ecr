@@ -74,6 +74,8 @@ namespace Delphin
         {
             List<string> lStr = new List<string>();
             String temp = String.Empty;
+            
+
             for (int i = 8; i < answerlenght; i++) // перебор массива ответа
             {
                 if (answer[i] != 09) // не встретили сепаратор

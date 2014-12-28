@@ -50,35 +50,31 @@ namespace ConsoleApplication1
              //}
 
 
-            Console.WriteLine(ecr.GetFirstDocNumberByDate("17-10-14"));
+            Console.WriteLine(ecr.GetFirstDocNumberByDate("20-10-14"));
+
+            //ecr.GetCheckByNum(23);
 
             Console.WriteLine("DisConnect - " + ecr.Disconnect().ToString());
 
 
             // TEST ECRfor1C
-            //ECRfor1C ecr1c = new ECRfor1C();
-            //ecr1c.Connect("192.168.88.53", 5999, 1);
+            ECRfor1C ecr1c = new ECRfor1C();
+            ecr1c.Connect("192.168.88.53", 5999, 1);
 
-            //ecr1c.ReadArticul(1);
-            //Console.WriteLine("ArtCode " + ecr1c.ArtCode);
-            //Console.WriteLine("ArtName " + ecr1c.ArtName);
-            //Console.WriteLine("ArtPrice " + ecr1c.ArtPrice);
-            //Console.WriteLine("ArtQnty " + ecr1c.ArtQnty);
-            //Console.WriteLine("ArtDep " + ecr1c.ArtDep);
-            //Console.WriteLine("ArtGrp " + ecr1c.ArtGrp);
-            //Console.WriteLine("ArtTax " + ecr1c.ArtTax);
-            //Console.WriteLine("ArtNC " + ecr1c.ArtNC);
-            //Console.WriteLine("ArtNK " + ecr1c.ArtNK);
-            //Console.WriteLine("ArtBarCode " + ecr1c.ArtBarCode);
-            //Console.WriteLine("ArtSaleQnty " + ecr1c.ArtSaleQnty);
-            //Console.WriteLine("ArtSaleSum " + ecr1c.ArtSaleSum);
+            ecr1c.DataSales = "20-10-14";
 
-            
-            
+            while (ecr1c.GetCheck())
+            {
+                Console.WriteLine("Чек - " + ecr1c.JArtCode + "  Дата - " + ecr1c.JCheckDate + "  Скидка на чек " + ecr1c.JCheckDis + "%" + " Возврат - " + ecr1c.JCheckIsReturn);
+                while (ecr1c.ReadSales())
+                {
+                    Console.WriteLine(ecr1c.JArtCode+" "+ecr1c.JArtName+" "+ecr1c.JArtPrice+" "+ecr1c.JArtQnt+" "+ecr1c.JArtSum+" "+ecr1c.JArtDis+" "+ecr1c.JArtVoid);
+                }
+            }
       
 
 
-            //ecr1c.Disconnect();
+            ecr1c.Disconnect();
 
             //}
             
