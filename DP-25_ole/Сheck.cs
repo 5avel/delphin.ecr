@@ -48,6 +48,7 @@ namespace Delphin
         public DateTime dateTime { get; set; }
         public uint num { get; set; }
         public bool isReturnCheck { get; set; }
+        public bool isVoidCheck { get; set; }
         public Collection<Good> goods { get; set; }
         public Collection<Payment> payments { get; set; }
         public double discSurc { get; set; }

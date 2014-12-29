@@ -512,21 +512,19 @@ namespace Delphin
                             {
                                 double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
                                 // надбавка на на все товары чека до текущего момента
-                                foreach (Good g in c.goods)
-                                {
-                                    g.discSurc -= proc; // отнимаем надбавку от каждого товара
-                                }
+                                c.discSurc = 0; // отнимаем надбавку от каждого товара
                             }
                             else if (buf[6] == 02) // скидка
                             {
                                 double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
                                 // скидка на на все товары чека до текущего момента
-                                foreach (Good g in c.goods) //  
-                                {
-                                    g.discSurc += proc; // отнимаем скидку от каждого товара
-                                }
+                                c.discSurc += proc; // отнимаем скидку от каждого товара
                             }
                         }
+                    }
+                    else if(buf[0] == 18)
+                    {
+                        c.isVoidCheck = true;
                     }
                 }
                 return c; // Возврат Чека

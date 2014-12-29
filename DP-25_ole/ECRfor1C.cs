@@ -157,14 +157,15 @@ namespace Delphin
         
 
         private Check check = null;
-        //private int FirstCheckNum = 0;
+        private int LastCheckNum = 0;
         private int CurentCheckNum = 0;
         private int CurentCheckLine = 0;
 
         /*
         
          *  JCheckNum – целое число, номер фискального чека
-            JCheckType – целое число, тип чека (1 – возвратный, 0 – чек продажи)
+            JCheckIsReturn – true - Чек возврата, false - Продажный чек.
+         *  JCheckIsVoid - true - Чек отменен, false - не отменен.
             JCheckDate - строка, дата чека   
             JCheckDis - вещественное число, процент скидки на весь Чек 0.00…99.99 (отрицательный - скидка, положительная – надбавка) 
          * 
@@ -181,6 +182,7 @@ namespace Delphin
 
         public uint JCheckNum { private set; get; }
         public bool JCheckIsReturn { private set; get; }
+        public bool JCheckIsVoid { private set; get; }
         public string JCheckDate { private set; get; }
         public double JCheckDis { private set; get; }
 
@@ -217,18 +219,26 @@ namespace Delphin
             if (CurentCheckNum == 0) // начало загрузки
             {
                 int num = ecr.GetFirstDocNumberByDate(DataSales);
-                if (num > 0) CurentCheckNum = num;
+                if (num > 0)
+                {
+                    CurentCheckNum = num;
+                    LastCheckNum = ecr.GetLastDocNumber();
+                }
             }
-            check = ecr.GetCheckByNum(CurentCheckNum++);
-            if (check != null)
+            check = ecr.GetCheckByNum(CurentCheckNum++); // Получаем чек по номеру
+            while (check == null) // если не чек, то пробуем следующий - пока не будет чек.
             {
-                if (check.dateTime > DateTime.Parse(DataSales + " 23:59:59")) return false; // Чек старше дады
-
+                check = ecr.GetCheckByNum(CurentCheckNum++);
+                if (CurentCheckNum >= LastCheckNum) break; // Чеки кончились
+            }
+            if(check != null) // если чек
+            {
+                if (check.dateTime > DateTime.Parse(DataSales + " 23:59:59")) return false; // Чек старше "заданной даты" 23:59:59
                 JCheckNum = check.num;
                 JCheckIsReturn = check.isReturnCheck;
+                JCheckIsVoid = check.isVoidCheck;
                 JCheckDate = check.dateTime.ToString();
                 JCheckDis = check.discSurc;
-                
                 return true;
             }
             return false;
