@@ -430,7 +430,9 @@ namespace Delphin
                     else if (buf[0] == 01 && c != null) // Продажа
                     {
                         uint code = BitConverter.ToUInt32(buf, 24); // код товара
+
                         string name = Encoding.Default.GetString(buf, 44, 32); // название товара
+                        name = name.Substring(0, name.IndexOf('\0'));
                         double price = Convert.ToDouble(BitConverter.ToUInt32(buf, 8)) / 100; // цена
                         double quantity = Convert.ToDouble(BitConverter.ToUInt32(buf, 40)) / 1000; // количество
                         double sum = Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100; // сумма
