@@ -21,6 +21,8 @@ namespace Delphin
 
         string GetDataTime();
         bool SetDataTime(string dataTime);
+
+        Check GetCheckByNum(int docNumber);
         
 
 

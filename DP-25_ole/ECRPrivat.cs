@@ -122,6 +122,9 @@ namespace Delphin
             {
                 List<string> lStr = Separating();
                 var dt = DateTime.Parse(lStr[1].Remove(16));
+
+                if ("КР00000481" != lStr[10]) return DateTime.MinValue;
+
                 return dt;
             }
             return DateTime.MinValue;

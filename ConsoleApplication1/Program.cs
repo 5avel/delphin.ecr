@@ -58,27 +58,29 @@ namespace ConsoleApplication1
             ecr.GetCheckByNum(177);
             //ecr.GetCheckByNum(23);
 
+            ecr.GetDateDocByDocNum(150);
+
             Console.WriteLine("DisConnect - " + ecr.Disconnect().ToString());
 
 
-            // TEST ECRfor1C
-            ECRfor1C ecr1c = new ECRfor1C();
-            Console.WriteLine(ecr1c.Connect("192.168.88.53", 5999, 1));
+            //// TEST ECRfor1C
+            //ECRfor1C ecr1c = new ECRfor1C();
+            //Console.WriteLine(ecr1c.Connect("192.168.88.53", 5999, 1));
 
-            ecr1c.DataSales = "29-12-14";
+            //ecr1c.DataSales = "29-12-14";
 
-            while (ecr1c.GetCheck())
-            {
-                Console.WriteLine("\n Чек - " + ecr1c.JCheckNum + "  Дата - " + ecr1c.JCheckDate + "\n  Скидка на чек " + ecr1c.JCheckDis + "%" + " Возврат - " + ecr1c.JCheckIsReturn + " Отменен -"+ecr1c.JCheckIsVoid);
-                while (ecr1c.ReadSales())
-                {
-                    Console.WriteLine("\t" + ecr1c.JArtCode + " " + ecr1c.JArtName + " " + ecr1c.JArtPrice + " " + ecr1c.JArtQnt + " " + ecr1c.JArtSum + " " + ecr1c.JArtDis + " " + ecr1c.JArtVoid);
-                }
-            }
+            //while (ecr1c.GetCheck())
+            //{
+            //    Console.WriteLine("\n Чек - " + ecr1c.JCheckNum + "  Дата - " + ecr1c.JCheckDate + "\n  Скидка на чек " + ecr1c.JCheckDis + "%" + " Возврат - " + ecr1c.JCheckIsReturn + " Отменен -"+ecr1c.JCheckIsVoid);
+            //    while (ecr1c.ReadSales())
+            //    {
+            //        Console.WriteLine("\t" + ecr1c.JArtCode + " " + ecr1c.JArtName + " " + ecr1c.JArtPrice + " " + ecr1c.JArtQnt + " " + ecr1c.JArtSum + " " + ecr1c.JArtDis + " " + ecr1c.JArtVoid);
+            //    }
+            //}
       
 
 
-            Console.WriteLine(ecr1c.Disconnect());
+            //Console.WriteLine(ecr1c.Disconnect());
 
             //}
             

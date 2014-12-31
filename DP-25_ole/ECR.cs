@@ -126,6 +126,8 @@ namespace Delphin
         public PLU ReadPlu(int pluCode)
         {
             if (client.Connected == false) return null; // состояние соединенияя
+
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
                                                                        // R
                                                        //31h 30h 37h 09h 52h 09h  
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 82, 09 };
@@ -158,6 +160,9 @@ namespace Delphin
         public bool DeletingPlu(int firstPlu, int lastPlu)
         {
             if (client.Connected == false) return false; // состояние соединенияя
+
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
+
                                                                        // D
                                                        //31h 30h 37h 09h 44h 09h  
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 68, 09 };
@@ -181,6 +186,9 @@ namespace Delphin
                                 double quantity, string bar1, string bar2, string bar3, string bar4, string name, int connectedPLU)
         {
             if (client.Connected == false) return false; // состояние соединенияя
+
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
+
                                                                        // P
                                                        //31h 30h 37h 09h 50h 09h  
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 80, 09 };
@@ -252,6 +260,8 @@ namespace Delphin
         {
             if (client.Connected == false) return null; // состояние соединенияя
 
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
+
             //31h 30h 37h 09h 44h 09h  
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 54, 50, 09};
 
@@ -269,7 +279,9 @@ namespace Delphin
         /// <returns></returns>
         public bool SetDataTime(string dataTime)
         {
-            if (client.Connected == false) return false; // состояние соединенияя           
+            if (client.Connected == false) return false; // состояние соединенияя     
+
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
  
             //31h 30h 37h 09h 44h 09h  
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 54, 49, 09 };
@@ -292,6 +304,8 @@ namespace Delphin
             if (client.Connected == false) return 0; // состояние соединенияя
 
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 52, 09, 09, 09};
+
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return 0; // нет лицензии
 
             if (Send(sendBytes))
             {
@@ -399,6 +413,8 @@ namespace Delphin
         public Check GetCheckByNum(int docNumber)
         {// 125 | 1 | docNum
             if (client.Connected == false) return null; // состояние соединенияя
+
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
 
             if (SetDocForRead(docNumber))
             {
@@ -540,6 +556,8 @@ namespace Delphin
         public string ReadDocStr(int docNumber)
         {// 125 | 1 | docNum
             if (client.Connected == false) return null; // состояние соединенияя
+
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
 
             byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 49, 09 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
