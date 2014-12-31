@@ -1,8 +1,5 @@
-﻿using System;
-using System.Net.Sockets;
-using System.Text;
-
-using Delphin;
+﻿using Delphin;
+using System;
 namespace ConsoleApplication1
 {
     class Program
@@ -13,7 +10,7 @@ namespace ConsoleApplication1
 
 
             ECR ecr = new ECR();
-            Console.WriteLine("Connect - " + ecr.Connect("192.168.88.53", 5999, 1).ToString());
+            Console.WriteLine("Connect - " + ecr.Connect("in4.pp.ua", 5999, 1).ToString());
 
             //Console.WriteLine(" last - " + ecr.GetLastDocNumber());
 
