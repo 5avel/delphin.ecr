@@ -60,6 +60,8 @@ namespace ConsoleApplication1
 
             ecr.GetDateDocByDocNum(150);
 
+            //test
+
             Console.WriteLine("DisConnect - " + ecr.Disconnect().ToString());
 
 
