@@ -58,6 +58,7 @@
     <Compile Include="Сheck.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="DP-25 COM %281%29.docx" />
     <None Include="key.snk" />
   </ItemGroup>
   <ItemGroup>
