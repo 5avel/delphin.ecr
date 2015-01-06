@@ -74,6 +74,18 @@ namespace Delphin
                 ArtSaleSum = art.Turnover;
                 return true;
             }
+                ArtCode = 0;
+                ArtName = "";
+                ArtPrice = 0;
+                ArtQnty = 0;
+                ArtDep = 0;
+                ArtGrp = 0;
+                ArtTax = 0;
+                ArtNC = 0;
+                ArtNK = 0;
+                ArtBarCode = "";
+                ArtSaleQnty = 0;
+                ArtSaleSum = 0;
             return false;
         }
 
