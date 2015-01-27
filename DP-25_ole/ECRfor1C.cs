@@ -28,8 +28,6 @@ namespace Delphin
         public byte ArtDep { private set; get; }
         public byte ArtGrp { private set; get; }
         public byte ArtTax { private set; get; }
-        public uint ArtNC { private set; get; }
-        public uint ArtNK { private set; get; }
         public string ArtBarCode { private set; get; }
         public double ArtSaleQnty { private set; get; }
         public double ArtSaleSum { private set; get; }
@@ -45,8 +43,6 @@ namespace Delphin
         /// ArtDep – номер отдела товара (целое число)
         /// ArtGrp – номер группы товара (целое число)
         /// ArtTax – номер налоговой группы товара (целое число)
-        /// ArtNC – признак товара (целое число)
-        /// ArtNK – признак ведения остатков товара (целое число)
         /// ArtBarCode – штрих-код товара (строка)
         /// ArtSaleQnty – количество проданного товара (вещественное число)
         /// ArtSaleSum– сумма проданного товара (вещественное число)
@@ -67,8 +63,6 @@ namespace Delphin
                 ArtDep = art.Dep;
                 ArtGrp = art.Group;
                 ArtTax = art.TaxGr;
-                ArtNC = 1;
-                ArtNK = 1;
                 ArtBarCode = art.Bar1;
                 ArtSaleQnty = art.SoldQty;
                 ArtSaleSum = art.Turnover;
@@ -81,8 +75,6 @@ namespace Delphin
                 ArtDep = 0;
                 ArtGrp = 0;
                 ArtTax = 0;
-                ArtNC = 0;
-                ArtNK = 0;
                 ArtBarCode = "";
                 ArtSaleQnty = 0;
                 ArtSaleSum = 0;
@@ -95,7 +87,6 @@ namespace Delphin
         /// Максимальное количество артикулов зависит от модели РРО. См. подробнее 
         /// описание Таблица 1 инструкции кассового аппарата.
         /// </summary>
-        /// <param name="Row"> Не используется! целое число, номер ряда таблицы артикулов, в которую будет запрограммирован товар.</param>
         /// <param name="Code">целое число, код артикула по которому будет осуществляться продажа товара. 
         /// Рекомендуется, чтобы номер ряда и код совпадали, во избежание путаницы.</param>
         /// <param name="Name">строка, наименование товара. Максимальная длина наименования зависит от модели РРО.</param>
@@ -104,13 +95,11 @@ namespace Delphin
         /// <param name="Dep">целое число, номер отдела.</param>
         /// <param name="Grp">целое число, номер группы товара.</param>
         /// <param name="Tax">целое число, номер налоговой группы товара.</param>
-        /// <param name="NC">целое число, признак товара</param>
-        /// <param name="NK">целое число, ведение остатков товара.</param>
         /// <param name="BarCode">строка, штрих-код товара (до 13 цифр)</param>
         /// <returns>Возвращаемое значение: логического типа, ИСТИНА, если функция выполнена успешно, ЛОЖЬ – если возникла ошибка. 
         /// Возвращаемое значение можно также прочитать функцией GetLastError, которая возвращает результат выполнения последней 
         /// функции (0-успешно, 1-ошибка).</returns>
-        public bool WriteArticul(int Row, int Code, string Name, double Price, double Qnty, byte Dep, byte Grp, byte Tax, byte NC, byte NK, string BarCode)
+        public bool WriteArticul(int Code, string Name, double Price, double Qnty, byte Dep, byte Grp, byte Tax, string BarCode)
         {
             return ecr.WritePlu(Code, Tax, Dep, Grp, 0, Price, 0, Qnty, BarCode, "", "", "", Name, 0);
         }
