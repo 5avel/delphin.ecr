@@ -420,7 +420,7 @@ namespace Delphin
             {
                 List<string> lStr = Separating();
                 var dt = DateTime.Parse(lStr[1].Remove(16));
-
+                int zNum = Int32.Parse(lStr[3]); // Номер Z-отчета
                 byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 50, 09 };
                 sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
                 sendBytes = sendBytes.Concat(SEP).ToArray();
@@ -436,11 +436,11 @@ namespace Delphin
                     {
                         if (buf[4] == 0) // Чек
                         {
-                            c = new Check(dt, BitConverter.ToUInt32(buf, 8));
+                            c = new Check(dt, BitConverter.ToUInt32(buf, 8), zNum);
                         }
                         else if (buf[4] == 1) // Возвратный Чек
                         {
-                            c = new Check(dt, BitConverter.ToUInt32(buf, 8), true);
+                            c = new Check(dt, BitConverter.ToUInt32(buf, 8), zNum, true);
                         }
                     }
                     else if (buf[0] == 01 && c != null) // Продажа

@@ -47,10 +47,10 @@ namespace ConsoleApplication1
              //}
 
 
-            Console.WriteLine(ecr.GetFirstDocNumberByDate("29-12-14"));
-            Console.WriteLine(ecr.GetLastDocNumber());
+            //Console.WriteLine(ecr.GetFirstDocNumberByDate("29-12-14"));
+           // Console.WriteLine(ecr.GetLastDocNumber());
 
-            ecr.GetCheckByNum(176);
+            ecr.GetCheckByNum(266);
             Console.WriteLine("  -//-//-//-  ");
             ecr.GetCheckByNum(177);
             //ecr.GetCheckByNum(23);

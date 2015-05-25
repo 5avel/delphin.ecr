@@ -47,16 +47,18 @@ namespace Delphin
     {
         public DateTime dateTime { get; set; }
         public uint num { get; set; }
+        public int zNumber { get; set; }
         public bool isReturnCheck { get; set; }
         public bool isVoidCheck { get; set; }
         public Collection<Good> goods { get; set; }
         public Collection<Payment> payments { get; set; }
         public double discSurc { get; set; }
 
-        internal Check(DateTime dt, uint num, bool isReturnCheck = false)
+        internal Check(DateTime dt, uint num, int zNumber, bool isReturnCheck = false)
         {
             this.dateTime = dt;
             this.num = num;
+            this.zNumber = zNumber;
             this.isReturnCheck = isReturnCheck;
             this.goods = new Collection<Good>();
             this.payments = new Collection<Payment>();
