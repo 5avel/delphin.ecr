@@ -9,8 +9,12 @@ namespace ConsoleApplication1
 
 
 
-            ECR ecr = new ECR();
-            Console.WriteLine("Connect - " + ecr.Connect("192.168.88.53", 5999, 1).ToString());
+            //ECRfor1C ecr = new ECRfor1C();
+            //Console.WriteLine("Connect - " + ecr.Connect("192.168.88.53", 5999, 1).ToString());
+
+
+
+
 
             //Console.WriteLine(" last - " + ecr.GetLastDocNumber());
 
@@ -50,36 +54,56 @@ namespace ConsoleApplication1
             //Console.WriteLine(ecr.GetFirstDocNumberByDate("29-12-14"));
            // Console.WriteLine(ecr.GetLastDocNumber());
 
-            ecr.GetCheckByNum(266);
-            Console.WriteLine("  -//-//-//-  ");
-            ecr.GetCheckByNum(177);
+            //ecr.GetCheckByNum(266);
+            //Console.WriteLine("  -//-//-//-  ");
+            //ecr.GetCheckByNum(177);
             //ecr.GetCheckByNum(23);
 
-            ecr.GetDateDocByDocNum(150);
+            //ecr.GetDateDocByDocNum(150);
 
             //test
 
-            Console.WriteLine("DisConnect - " + ecr.Disconnect().ToString());
+            //Console.WriteLine("DisConnect - " + ecr.Disconnect().ToString());
 
 
             //// TEST ECRfor1C
-            //ECRfor1C ecr1c = new ECRfor1C();
-            //Console.WriteLine(ecr1c.Connect("192.168.88.53", 5999, 1));
+            ECRfor1C ecr1c = new ECRfor1C();
+            Console.WriteLine(ecr1c.Connect("192.168.88.53", 5999, 1));
 
-            //ecr1c.DataSales = "29-12-14";
+            ecr1c.DataSales = "22-05-15";
+            while (ecr1c.GetCheck())
+            {
+                Console.WriteLine("\n Чек - " + ecr1c.JCheckNum + "  Дата - " + ecr1c.JCheckDate + "\n  Скидка на чек " + ecr1c.JCheckDis + "%" + " Возврат - " + ecr1c.JCheckIsReturn + " Отменен -" + ecr1c.JCheckIsVoid + " Z -" + ecr1c.JCheckNumZRep);
+                while (ecr1c.ReadSales())
+                {
+                    Console.WriteLine("\t" + ecr1c.JArtCode + " " + ecr1c.JArtName + " " + ecr1c.JArtPrice + " " + ecr1c.JArtQnt + " " + ecr1c.JArtSum + " " + ecr1c.JArtDis + " " + ecr1c.JArtVoid);
+                }
+            }
 
-            //while (ecr1c.GetCheck())
-            //{
-            //    Console.WriteLine("\n Чек - " + ecr1c.JCheckNum + "  Дата - " + ecr1c.JCheckDate + "\n  Скидка на чек " + ecr1c.JCheckDis + "%" + " Возврат - " + ecr1c.JCheckIsReturn + " Отменен -"+ecr1c.JCheckIsVoid);
-            //    while (ecr1c.ReadSales())
-            //    {
-            //        Console.WriteLine("\t" + ecr1c.JArtCode + " " + ecr1c.JArtName + " " + ecr1c.JArtPrice + " " + ecr1c.JArtQnt + " " + ecr1c.JArtSum + " " + ecr1c.JArtDis + " " + ecr1c.JArtVoid);
-            //    }
-            //}
+            ecr1c.DataSales = "25-05-15";
+            while (ecr1c.GetCheck())
+            {
+                Console.WriteLine("\n Чек - " + ecr1c.JCheckNum + "  Дата - " + ecr1c.JCheckDate + "\n  Скидка на чек " + ecr1c.JCheckDis + "%" + " Возврат - " + ecr1c.JCheckIsReturn + " Отменен -" + ecr1c.JCheckIsVoid + " Z -" + ecr1c.JCheckNumZRep);
+                while (ecr1c.ReadSales())
+                {
+                    Console.WriteLine("\t" + ecr1c.JArtCode + " " + ecr1c.JArtName + " " + ecr1c.JArtPrice + " " + ecr1c.JArtQnt + " " + ecr1c.JArtSum + " " + ecr1c.JArtDis + " " + ecr1c.JArtVoid);
+                }
+            }
+
+
+            ecr1c.DataSales = "31-05-15";
+            while (ecr1c.GetCheck())
+            {
+                Console.WriteLine("\n Чек - " + ecr1c.JCheckNum + "  Дата - " + ecr1c.JCheckDate + "\n  Скидка на чек " + ecr1c.JCheckDis + "%" + " Возврат - " + ecr1c.JCheckIsReturn + " Отменен -" + ecr1c.JCheckIsVoid + " Z -" + ecr1c.JCheckNumZRep);
+                while (ecr1c.ReadSales())
+                {
+                    Console.WriteLine("\t" + ecr1c.JArtCode + " " + ecr1c.JArtName + " " + ecr1c.JArtPrice + " " + ecr1c.JArtQnt + " " + ecr1c.JArtSum + " " + ecr1c.JArtDis + " " + ecr1c.JArtVoid);
+                }
+            }
       
 
 
-            //Console.WriteLine(ecr1c.Disconnect());
+            Console.WriteLine(ecr1c.Disconnect());
 
             //}
             
