@@ -28,10 +28,10 @@ namespace Delphin
 
     public class Payment
     {
-        public byte type { get; set; }
-        public double pay { get; set; }
-        public double change { get; set; }
-        public double sum { get; set; }
+        public byte type { get; set; } // Тип оплаты 0 - нал, 1 - карта, 2- кредит и тд.
+        public double pay { get; set; } // сумма платежа
+        public double change { get; set; }   // сжача
+        public double sum { get; set; }     // сумма 
 
         internal Payment(byte type, double pay, double change)
         {

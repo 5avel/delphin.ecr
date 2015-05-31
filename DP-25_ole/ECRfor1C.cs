@@ -183,7 +183,17 @@ namespace Delphin
         public bool JCheckIsVoid { private set; get; }
         public string JCheckDate { private set; get; }
         public double JCheckDis { private set; get; }
+
         public int JCheckNumZRep { private set; get; } // Номер Z-отчета
+        public int JCheckPayCount { private set; get; } // Количество оплат
+        public int JCheckPay1Type { private set; get; }
+        public double JCheckPay1Sum { private set; get; }
+        public int JCheckPay2Type { private set; get; }
+        public double JCheckPay2Sum { private set; get; }
+        public int JCheckPay3Type { private set; get; }
+        public double JCheckPay3Sum { private set; get; }
+
+
 
         public uint JArtCode { private set; get; }
         public bool JArtVoid { private set; get; }
@@ -245,6 +255,25 @@ namespace Delphin
                 JCheckDate = check.dateTime.ToString();
                 JCheckDis = check.discSurc;
                 JCheckNumZRep = check.zNumber;
+
+                JCheckPayCount = check.payments.Count;
+                if (JCheckPayCount > 0)
+                {
+                    JCheckPay1Type = check.payments[0].type;
+                    JCheckPay1Sum = check.payments[0].pay;
+                }
+
+                if (JCheckPayCount > 1)
+                {
+                    JCheckPay2Type = check.payments[1].type;
+                    JCheckPay2Sum = check.payments[1].pay;
+                }
+                else if (JCheckPayCount == 3)
+                {
+                    JCheckPay3Type = check.payments[2].type;
+                    JCheckPay3Sum = check.payments[2].pay;
+                }
+
                 return true;
             }
             return false;
