@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="Delphin.ECR" BaseTypeListCollapsed="true">
+    <Position X="4.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>oAQAAEACAAAAEGAIAEAAAKACJAAAAAAEFCQABAAACAI=</HashCode>
+      <FileName>ECR.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.142" Collapsed="true" />
+  </Class>
+  <Class Name="Delphin.ECRfor1C">
+    <Position X="9" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QBQABASAIBIIAgAlAAQAIIACIcUQJAAIAACAEBEQAAU=</HashCode>
+      <FileName>ECRfor1C.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delphin.PLU">
+    <Position X="7.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>UAABAEAABQCgBwWAIAAggIQAYACUAEAAAAAAAIAHAAA=</HashCode>
+      <FileName>PLU.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delphin.Good">
+    <Position X="2.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABBAAAABAAAAAAAAAAAAAAIAAEAADAAAAAAAAAAAA=</HashCode>
+      <FileName>Сheck.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delphin.Payment">
+    <Position X="0.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABEACAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Сheck.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delphin.Check">
+    <Position X="2.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIBGAAABAAAAAAAAAAAAAABAAAAAAAAAAAICAAAgA=</HashCode>
+      <FileName>Сheck.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Delphin.IECR">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAEACAAAAAAAAAAAAAIACBAAAAAAAEAQAAAAACAA=</HashCode>
+      <FileName>IECR.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Delphin.IEvents">
+    <Position X="0.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IEvents.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
