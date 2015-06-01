@@ -193,6 +193,10 @@ namespace Delphin
         public int JCheckPay3Type { private set; get; }
         public double JCheckPay3Sum { private set; get; }
 
+        public double JCheckSum { private set; get; }
+        public double JCheckTax1Sum { private set; get; }
+        public double JCheckTax1Zbir { private set; get; }
+
 
 
         public uint JArtCode { private set; get; }
@@ -205,6 +209,7 @@ namespace Delphin
 
         public bool ReadSales()
         {
+            JArtReset();  // Обнуляем переменные товара
             if(CurentCheckLine <= check.goods.Count-1)
             {
                 //Заполняем переменные и увелисиваем счетчик
@@ -225,6 +230,7 @@ namespace Delphin
 
         public bool GetCheck()
         {
+            JCheckReset(); // Обнуляем переменные Чека
             if (CurentCheckNum == 0) // начало загрузки
             {
                 int num = ecr.GetFirstDocNumberByDate(DataSales); // Получаем номер первого документа на дату
@@ -240,7 +246,7 @@ namespace Delphin
             while (check == null) // если не чек, то пробуем следующий - пока не будет чек.
             {
                 check = ecr.GetCheckByNum(CurentCheckNum++);
-                if (CurentCheckNum >= LastCheckNum) break; // Чеки кончились
+                if (CurentCheckNum > LastCheckNum) break; // Чеки кончились
             }
             if(check != null) // если чек
             {
@@ -256,27 +262,64 @@ namespace Delphin
                 JCheckDis = check.discSurc;
                 JCheckNumZRep = check.zNumber;
 
+                JCheckSum = check.CheckSum;
+                JCheckTax1Sum = check.CheckTax1Sam;
+                JCheckTax1Zbir = check.CheckTax1ZbirSam;
+
                 JCheckPayCount = check.payments.Count;
                 if (JCheckPayCount > 0)
                 {
                     JCheckPay1Type = check.payments[0].type;
-                    JCheckPay1Sum = check.payments[0].pay;
+                    JCheckPay1Sum = check.payments[0].sum;
                 }
 
                 if (JCheckPayCount > 1)
                 {
                     JCheckPay2Type = check.payments[1].type;
-                    JCheckPay2Sum = check.payments[1].pay;
+                    JCheckPay2Sum = check.payments[1].sum;
                 }
                 else if (JCheckPayCount == 3)
                 {
                     JCheckPay3Type = check.payments[2].type;
-                    JCheckPay3Sum = check.payments[2].pay;
+                    JCheckPay3Sum = check.payments[2].sum;
                 }
 
                 return true;
             }
             return false;
+        }
+
+
+        private void JCheckReset()
+        {
+            JCheckNum = 0;
+            JCheckIsReturn = false;
+            JCheckIsVoid = false;
+            JCheckDate = "";
+            JCheckDis = 0;
+            JCheckNumZRep = 0;
+            JCheckPayCount = 0;
+            JCheckPay1Type = 0;
+            JCheckPay1Sum = 0;
+            JCheckPay2Type = 0;
+            JCheckPay2Sum = 0;
+            JCheckPay3Type = 0;
+            JCheckPay3Sum = 0;
+
+            JCheckSum = 0;
+            JCheckTax1Sum = 0;
+            JCheckTax1Zbir = 0;
+        }
+
+        private void JArtReset()
+        {
+            JArtCode = 0;
+            JArtVoid = false;
+            JArtPrice = 0;
+            JArtQnt = 0;
+            JArtSum = 0;
+            JArtDis = 0;
+            JArtName = "";
         }
         
 

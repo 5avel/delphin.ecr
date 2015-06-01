@@ -53,6 +53,9 @@ namespace Delphin
         public Collection<Good> goods { get; set; }
         public Collection<Payment> payments { get; set; }
         public double discSurc { get; set; }
+        public double CheckSum { get; set; }
+        public double CheckTax1Sam { get; set; }
+        public double CheckTax1ZbirSam { get; set; }
 
         internal Check(DateTime dt, uint num, int zNumber, bool isReturnCheck = false)
         {

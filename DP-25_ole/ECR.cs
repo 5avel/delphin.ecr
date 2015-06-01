@@ -482,8 +482,12 @@ namespace Delphin
                             else if (buf[6] == 02) // скидка
                             {
                                 double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
+
+                                double test = Convert.ToDouble(BitConverter.ToUInt64(buf, 24)) / 100;
                                 // скидка на последний товар, на текущий момент.
                                 c.goods.Last<Good>().discSurc = -proc;
+
+
                             }
                         }
                     }
@@ -541,6 +545,19 @@ namespace Delphin
                     else if(buf[0] == 18)
                     {
                         c.isVoidCheck = true;
+                    }
+                    else if(buf[0] == 100)
+                    {  // налоги
+                        double testSum = Convert.ToDouble(BitConverter.ToUInt64(buf, 8)) / 100;
+                        double tax1sum = Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100;
+                        double zbir1sum = Convert.ToDouble(BitConverter.ToUInt64(buf, 24)) / 100;
+                        double checkSum = Convert.ToDouble(BitConverter.ToUInt64(buf, 40)) / 100;
+                        if (c.CheckTax1ZbirSam == 0 && checkSum != 0)
+                        {
+                            c.CheckSum = checkSum;
+                            c.CheckTax1Sam = tax1sum;
+                            c.CheckTax1ZbirSam = zbir1sum;
+                        }
                     }
                 }
                 return c; // Возврат Чека
