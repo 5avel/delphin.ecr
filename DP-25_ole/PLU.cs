@@ -1,11 +1,8 @@
-﻿using System;
-using System.Text;
-
+﻿
 namespace Delphin
 {
     public class PLU
     {
-
         private int code;
         public int Code
         {
@@ -109,8 +106,6 @@ namespace Delphin
         {
             get { return connectedPLU; }
             internal set { connectedPLU = value; }
-        }
-
-        
+        } 
     }
 }

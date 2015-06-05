@@ -39,7 +39,15 @@ namespace Delphin
                     {
                         if (bytes[5] == 00)
                         {
-                            return true;
+                            if (DateTime.MinValue == GetDateDocByDocNum(1))
+                            {
+                                Disconnect();
+                                return false;
+                            }
+                            else
+                            {
+                                return true;
+                            }
                         }
                         else if (bytes[5] == 02)
                         {
@@ -334,7 +342,7 @@ namespace Delphin
             int maxDocNum = GetLastDocNumber();
             DateTime dt;
             DateTime dtIn = DateTime.Parse(dateIn);
-            DateTime dtOut = DateTime.Parse(dateOut);
+            DateTime dtOut = DateTime.Parse(dateOut+" 23:59:59");
             DateTime dtFirstDoc = GetDateDocByDocNum(1);
 
             // первый документ входит в диапозон
@@ -414,7 +422,7 @@ namespace Delphin
         {// 125 | 1 | docNum
             if (client.Connected == false) return null; // состояние соединенияя
 
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
+            //if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
 
             if (SetDocForRead(docNumber))
             {
