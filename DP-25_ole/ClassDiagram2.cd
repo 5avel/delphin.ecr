@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="Delphin.ECR" BaseTypeListCollapsed="true">
+    <Position X="8" Y="0.5" Width="15.5" />
+    <TypeIdentifier>
+      <HashCode>oAQAAEACAAAAEGAIAEAAAKACJAAAAAAEFCQABAAACAI=</HashCode>
+      <FileName>ECR.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Delphin.ECRfor1C">
+    <Position X="0.75" Y="2.75" Width="7" />
+    <TypeIdentifier>
+      <HashCode>RBQgBgaAIBIIAoChgEQAIYACocUQJQAIkACAEBEQgAU=</HashCode>
+      <FileName>ECRfor1C.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delphin.PLU">
+    <Position X="8" Y="7.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>UAABAEAABQCgBwWAIAAggIQAYACUAEAAAAAAAIAHAAA=</HashCode>
+      <FileName>PLU.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delphin.Good">
+    <Position X="18" Y="7.5" Width="5.5" />
+    <TypeIdentifier>
+      <HashCode>AAABBAAAABAAAAAAAAAAAAAAIAAEAADAAAAAAAAAAAA=</HashCode>
+      <FileName>Сheck.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delphin.Payment">
+    <Position X="18" Y="10.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABEACAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Сheck.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Delphin.Check">
+    <Position X="10.75" Y="7.5" Width="7" />
+    <TypeIdentifier>
+      <HashCode>AAAIBGAAABAAAAAAAAAAAgAgBAAAEAAAAAAAICBAAgA=</HashCode>
+      <FileName>Сheck.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
