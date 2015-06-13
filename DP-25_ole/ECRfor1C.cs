@@ -176,8 +176,8 @@ namespace Delphin
             JArtQnt – вещественное число, количество проданного артикула
             JArtDis– – вещественное число, процент скидки на товар 0.00…99.99 (отрицательный - скидка, положительная – надбавка) 
          */
+        public string DataSalesFrom { set; get; }
         public string DataSalesTo { set; get; }
-        public string DataSalesOf { set; get; }
 
         public uint JCheckNum { private set; get; }
         public bool JCheckIsReturn { private set; get; }
@@ -234,8 +234,8 @@ namespace Delphin
             JCheckReset(); // Обнуляем переменные Чека
             if (CurentCheckNum == 0) // начало загрузки
             {
-                if (DataSalesOf == null) DataSalesOf = DataSalesTo;
-                int num = ecr.GetFirstDocNumberByDate(DataSalesTo, DataSalesOf); // Получаем номер первого документа на дату
+                if (DataSalesTo == null) DataSalesTo = DataSalesFrom;
+                int num = ecr.GetFirstDocNumberByDate(DataSalesFrom, DataSalesTo); // Получаем номер первого документа на дату
                 if (num > 0) // если он больше нуля то устанавливаем его для чтения
                 {
                     CurentCheckNum = num;
@@ -252,9 +252,11 @@ namespace Delphin
             }
             if(check != null) // если чек
             {
-                if (check.dateTime > DateTime.Parse(DataSalesOf + " 23:59:59")) // Чек старше "заданной даты" 23:59:59
+                if (check.dateTime > DateTime.Parse(DataSalesTo + " 23:59:59")) // Чек старше "заданной даты" 23:59:59
                 {
                     CurentCheckNum = 0;
+                    DataSalesFrom = "";
+                    DataSalesTo = "";
                     return false; 
                 }
                 JCheckNum = check.num;
