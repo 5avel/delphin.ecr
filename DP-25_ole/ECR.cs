@@ -79,40 +79,18 @@ namespace Delphin
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(len.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
 
-            Send(sendBytes);
-            long t = Environment.TickCount;
-            while (!isAnfer) // цикл ожидания ответа с СОМ порта
-            {
-
-                if ((Environment.TickCount - t) > 500)
-                {
-                    Console.WriteLine("Таймаут 500мс");
-                    break;
-                }
-            }
-
-            if (isAnfer)
-            {
-
-                Console.WriteLine("Data Received:");
-                Console.WriteLine(BitConverter.ToString(answer));
-                Console.WriteLine();
-            }
-            isAnfer = false;
-            return true;
+            if (Send(sendBytes))
+                return true;
+            return false;
         }
 
         public PLU ReadPlu(int pluCode)
         {
-            if (client.Connected == false) return null; // состояние соединенияя
-
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
-                                                                       // R
-                                                       //31h 30h 37h 09h 52h 09h  
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 82, 09 };
+            byte[] sendBytes = { 107, 82, 09 };
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(pluCode.ToString())).ToArray(); // 31h
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
-            if(Send(sendBytes) && answerlenght > 8)
+    
+            if (Send(sendBytes))
             {
                 PLU plu = new PLU();
                 List<string> lPlu = Separating();
@@ -138,13 +116,8 @@ namespace Delphin
 
         public bool DeletingPlu(int firstPlu, int lastPlu)
         {
-            if (client.Connected == false) return false; // состояние соединенияя
 
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
-
-                                                                       // D
-                                                       //31h 30h 37h 09h 44h 09h  
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 68, 09 };
+            byte[] sendBytes = { 107, 104, 09 };
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(firstPlu.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(lastPlu.ToString())).ToArray();

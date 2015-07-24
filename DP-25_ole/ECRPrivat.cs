@@ -73,7 +73,34 @@ namespace Delphin
 
             sP.Write(ret, 0, ret.Length);
 
-            return true;
+            WaitinпAnswer();
+            if (answerlenght > 8 && answer[5] == 80)
+                return true;
+
+            return false;
+        }
+
+        private void WaitinпAnswer()
+        {
+            long t = Environment.TickCount;
+            while (!isAnfer) // цикл ожидания ответа с СОМ порта
+            {
+
+                if ((Environment.TickCount - t) > 500)
+                {
+                    Console.WriteLine("Таймаут 500мс");
+                    break;
+                }
+            }
+
+            if (isAnfer)
+            {
+
+                Console.WriteLine("Data Received:");
+                Console.WriteLine(BitConverter.ToString(answer));
+                Console.WriteLine();
+            }
+            isAnfer = false;
         }
 
         /// <summary>
@@ -86,7 +113,7 @@ namespace Delphin
             String temp = String.Empty;
             
 
-            for (int i = 8; i < answerlenght; i++) // перебор массива ответа
+            for (int i = 7; i < answerlenght; i++) // перебор массива ответа
             {
                 if (answer[i] != 09) // не встретили сепаратор
                 {
