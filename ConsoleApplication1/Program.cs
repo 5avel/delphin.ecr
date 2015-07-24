@@ -19,8 +19,13 @@ namespace ConsoleApplication1
             PLU p1 = ecr.ReadPlu(1);
             PLU p2 = ecr.ReadPlu(2);
             PLU p3 = ecr.ReadPlu(3);
+            
 
-            Console.WriteLine(p1.Name+"  "+p2.Name+"  "+p3.Name+"  ");
+            ecr.WritePlu(4, 1, 15.55, "Ура работает");
+
+            PLU p4 = ecr.ReadPlu(4);
+
+            Console.WriteLine(p1.Name + "  " + p2.Name + "  " + p3.Name + "  " + p4.Name + "  ");
 
 
 

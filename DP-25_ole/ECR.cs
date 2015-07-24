@@ -137,13 +137,8 @@ namespace Delphin
         public bool WritePlu(   int plu, byte taxGr, byte dep, byte group, byte priceType, double price, double addQty,
                                 double quantity, string bar1, string bar2, string bar3, string bar4, string name, int connectedPLU)
         {
-            if (client.Connected == false) return false; // состояние соединенияя
 
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
-
-                                                                       // P
-                                                       //31h 30h 37h 09h 50h 09h  
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 80, 09 };
+            byte[] sendBytes = { 107, 80, 09 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(plu.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(taxGr.ToString())).ToArray();
