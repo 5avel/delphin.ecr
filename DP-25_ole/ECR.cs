@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
 namespace Delphin
 {
@@ -13,110 +15,60 @@ namespace Delphin
 
 #region Public methods
 
-        public bool Connect(string ip, int port, byte logNum)
+        public bool Connect(int port, int speed = 115200)
         {
-            if(logNum>0|| logNum<100)
-            {
-                this.logNum = logNum;
-            }
-            else
-            {
-                return false;
-            }
+
             try
             {
-                client = new TcpClient();
-                client.Connect(ip, port); // Соединяемся с сервером
-                if (client.Connected)
-                {
-                    tcpStream = client.GetStream();
-                    byte[] sendBytes = { 5, 5, 1, 0, logNum, 0 }; // Open SET
-                    tcpStream.Write(sendBytes, 0, sendBytes.Length);
+                sP = new SerialPort("COM" + port, speed, Parity.None, 8, StopBits.One);
+                sP.WriteTimeout = 500; sP.ReadTimeout = 500;
 
-                    byte[] bytes = new byte[client.ReceiveBufferSize];
-                    int bytesRead = tcpStream.Read(bytes, 0, client.ReceiveBufferSize);
-                    if (bytesRead > 0)
-                    {
-                        if (bytes[5] == 00)
-                        {
-                            if (DateTime.MinValue == GetDateDocByDocNum(1))
-                            {
-                                Disconnect();
-                                return false;
-                            }
-                            else
-                            {
-                                return true;
-                            }
-                        }
-                        else if (bytes[5] == 02)
-                        {
-                            return false;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                    else 
-                    {
-                        return false;
-                    }
-                }
-                else
+                Thread.Sleep(200);
+
+                sP.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+
+                if (sP.IsOpen == true)
+                    sP.Close();
+
+                sP.Open();
+                if (sP.IsOpen == true)
                 {
-                    return false;
+                    return true;
                 }
+                return false;
             }
-            catch(SocketException ex)
+            catch (Exception ex)
             {
                 Console.WriteLine("Exception: " + ex.ToString());
                 return false;
             }
         }
 
+        /// <summary>
+        /// Событие появления во входном буфере данных.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
+        {
+            Thread.Sleep(5); // задежка, что бы дать устройству премя дописать сообщение
+            SerialPort sp = (SerialPort)sender;
+            answerlenght = sp.BytesToRead;
+            answer = new byte[answerlenght];
+            sp.Read(answer, 0, answerlenght);
+            isAnfer = true;
+        }
+
         public bool Disconnect()
         {
-            try
-            {
-                if (client.Connected)
-                {
-                    tcpStream = client.GetStream();
-                    byte[] sendBytes = { 5, 5, 2, 0, this.logNum, 0 }; // Close SET
-                    tcpStream.Write(sendBytes, 0, sendBytes.Length);
+            if (sP.IsOpen == true)
+                sP.Close();
 
-                    byte[] bytes = new byte[client.ReceiveBufferSize];
-                    int bytesRead = tcpStream.Read(bytes, 0, client.ReceiveBufferSize);
-                    if (bytesRead > 0)
-                    {
-                        if (bytes[5] == 00)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch (SocketException ex)
+            if (sP.IsOpen == false)
             {
-                Console.WriteLine("Exception: " + ex.ToString());
-                return false;
+                return true;
             }
-            finally
-            {
-                client.Close();
-            }
+            return false;
         }
 
         public bool Beep(int tone, int len)

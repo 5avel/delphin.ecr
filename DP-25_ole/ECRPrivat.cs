@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -11,8 +12,13 @@ namespace Delphin
     {
         #region Private Field
 
-        
-        internal TcpClient client = null;
+        internal SerialPort sP;
+        internal TcpClient client = null; // d
+
+        internal bool isAnfer = false; // есть ответ
+
+
+
         private NetworkStream tcpStream = null;
         private byte logNum = 0;
         private byte[] SEP = { 9 };

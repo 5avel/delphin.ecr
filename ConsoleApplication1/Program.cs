@@ -79,6 +79,9 @@ namespace ConsoleApplication1
 
             Console.WriteLine(mils);
 
+
+             Console.WriteLine(ecr1c.WriteArticul(1, "Ntcn tovar", 15.54, 0, 1, 1, 1, ""));
+
             //ecr1c.DataSales = "22-05-15";
             //while (ecr1c.GetCheck())
             //{
@@ -100,27 +103,27 @@ namespace ConsoleApplication1
             //}
 
 
-            ecr1c.DataSalesFrom = "01-06-15";
-            ecr1c.DataSalesTo = "05-06-15";
-            while (ecr1c.GetCheck())
-            {
-                Console.WriteLine("\n Чек - " + ecr1c.JCheckNum + "  Дата - " + ecr1c.JCheckDate + "\n  Скидка на чек " + ecr1c.JCheckDis + "%" + " Возврат - " + ecr1c.JCheckIsReturn + " Отменен -" + ecr1c.JCheckIsVoid + " Z -" + ecr1c.JCheckNumZRep);
-                while (ecr1c.ReadSales())
-                {
-                    Console.WriteLine("\t" + ecr1c.JArtCode + " " + ecr1c.JArtName + " " + ecr1c.JArtPrice + " " + ecr1c.JArtQnt + " " + ecr1c.JArtSum + " " + ecr1c.JArtDis + " " + ecr1c.JArtVoid);
-                }
-                Console.WriteLine("Количество Оплат = " + ecr1c.JCheckPayCount);
-                Console.WriteLine("ВИД Оплаты1 - " + ecr1c.JCheckPay1Type);
-                Console.WriteLine("Сумма Оплаты1 - " + ecr1c.JCheckPay1Sum);
-                Console.WriteLine("ВИД Оплаты2 - " + ecr1c.JCheckPay2Type);
-                Console.WriteLine("Сумма Оплаты2 - " + ecr1c.JCheckPay2Sum);
-                Console.WriteLine("ВИД Оплаты3 - " + ecr1c.JCheckPay3Type);
-                Console.WriteLine("Сумма Оплаты3 - " + ecr1c.JCheckPay3Sum);
-                Console.WriteLine("Сумма Чека - " + ecr1c.JCheckSum);
-                Console.WriteLine("Tax1 - " + ecr1c.JCheckTax1Sum);
-                Console.WriteLine("Tax1Zbir - " + ecr1c.JCheckTax1Zbir);
+            //ecr1c.DataSalesFrom = "01-06-15";
+            //ecr1c.DataSalesTo = "05-06-15";
+            //while (ecr1c.GetCheck())
+            //{
+            //    Console.WriteLine("\n Чек - " + ecr1c.JCheckNum + "  Дата - " + ecr1c.JCheckDate + "\n  Скидка на чек " + ecr1c.JCheckDis + "%" + " Возврат - " + ecr1c.JCheckIsReturn + " Отменен -" + ecr1c.JCheckIsVoid + " Z -" + ecr1c.JCheckNumZRep);
+            //    while (ecr1c.ReadSales())
+            //    {
+            //        Console.WriteLine("\t" + ecr1c.JArtCode + " " + ecr1c.JArtName + " " + ecr1c.JArtPrice + " " + ecr1c.JArtQnt + " " + ecr1c.JArtSum + " " + ecr1c.JArtDis + " " + ecr1c.JArtVoid);
+            //    }
+            //    Console.WriteLine("Количество Оплат = " + ecr1c.JCheckPayCount);
+            //    Console.WriteLine("ВИД Оплаты1 - " + ecr1c.JCheckPay1Type);
+            //    Console.WriteLine("Сумма Оплаты1 - " + ecr1c.JCheckPay1Sum);
+            //    Console.WriteLine("ВИД Оплаты2 - " + ecr1c.JCheckPay2Type);
+            //    Console.WriteLine("Сумма Оплаты2 - " + ecr1c.JCheckPay2Sum);
+            //    Console.WriteLine("ВИД Оплаты3 - " + ecr1c.JCheckPay3Type);
+            //    Console.WriteLine("Сумма Оплаты3 - " + ecr1c.JCheckPay3Sum);
+            //    Console.WriteLine("Сумма Чека - " + ecr1c.JCheckSum);
+            //    Console.WriteLine("Tax1 - " + ecr1c.JCheckTax1Sum);
+            //    Console.WriteLine("Tax1Zbir - " + ecr1c.JCheckTax1Zbir);
 
-            }
+            //}
       
 
 
