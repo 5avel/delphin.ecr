@@ -12,7 +12,7 @@ namespace Delphin
 
         public bool Connect(string ip, int port, byte logNum)
         {
-            return ecr.Connect(ip, port, logNum);
+            return ecr.Connect(port, logNum);
         }
 
         public bool Disconnect()

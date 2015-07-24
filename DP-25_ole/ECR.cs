@@ -73,14 +73,33 @@ namespace Delphin
 
         public bool Beep(int tone, int len)
         {
-            if (client.Connected == false) return false; // состояние соединенияя
-
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 56, 48, 09 };
+            byte[] sendBytes = { 80 };
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(tone.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(len.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
-            return Send(sendBytes);
+
+            Send(sendBytes);
+            long t = Environment.TickCount;
+            while (!isAnfer) // цикл ожидания ответа с СОМ порта
+            {
+
+                if ((Environment.TickCount - t) > 500)
+                {
+                    Console.WriteLine("Таймаут 500мс");
+                    break;
+                }
+            }
+
+            if (isAnfer)
+            {
+
+                Console.WriteLine("Data Received:");
+                Console.WriteLine(BitConverter.ToString(answer));
+                Console.WriteLine();
+            }
+            isAnfer = false;
+            return true;
         }
 
         public PLU ReadPlu(int pluCode)

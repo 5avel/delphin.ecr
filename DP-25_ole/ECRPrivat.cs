@@ -16,7 +16,7 @@ namespace Delphin
         internal TcpClient client = null; // d
 
         internal bool isAnfer = false; // есть ответ
-
+        internal byte cNum = 32; // порядковый номер соосбщения
 
 
         private NetworkStream tcpStream = null;
@@ -33,42 +33,47 @@ namespace Delphin
         /// </summary>
         /// <param name="sendBytes"> Массив байт для отправки.</param>
         /// <returns></returns>
-        private bool Send(byte[] sendBytes)
+        private bool Send(byte[] Send)
         {
-            if (client.Connected)
+            byte len = Convert.ToByte(Send.Length + 35);
+            cNum++;
+            if (cNum == 255) cNum = 32;
+            byte[] pAmbl = { 05 };
+            byte[] ret = { 01, len, cNum };
+            ret = ret.Concat(Send).ToArray();
+            ret = ret.Concat(pAmbl).ToArray();
+            int bSum = 0; // сумма байт
+            for (int i = 1; i < ret.Length; i++)
             {
-                byte[] leng = { Convert.ToByte(sendBytes.Length) };
-                sendBytes = leng.Concat(sendBytes).ToArray();
-                tcpStream.Write(sendBytes, 0, sendBytes.Length);
-                byte[] bytes = new byte[client.ReceiveBufferSize];
-                int bytesRead = tcpStream.Read(bytes, 0, client.ReceiveBufferSize);
-                if (bytesRead > 0)
-                {
-                    if (bytes[6] == 80)
-                    {
-                        // answer = BitConverter.ToString(bytes, 0, bytesRead);
-                        answer = bytes;
-                        answerlenght = bytesRead;
-                        return true;
-                    }
-                    else if (bytes[6] == 70)
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    return false;
-                }
+                bSum += ret[i];
             }
-            else
-            {
-                return false;
-            }
+
+            byte[] arrB = BitConverter.GetBytes(bSum);
+            byte b11 = arrB[1];
+            byte b12 = arrB[1];
+            b11 >>= 4;
+            b11 += 48;
+
+            b12 <<= 4;
+            b12 >>= 4;
+            b12 += 48;
+
+            byte b21 = arrB[0];
+            byte b22 = arrB[0];
+            b21 >>= 4;
+            b21 += 48;
+
+            b22 <<= 4;
+            b22 >>= 4;
+            b22 += 48;
+
+            byte[] checkSum = { b11, b12, b21, b22, 03 };
+
+            ret = ret.Concat(checkSum).ToArray();
+
+            sP.Write(ret, 0, ret.Length);
+
+            return true;
         }
 
         /// <summary>
