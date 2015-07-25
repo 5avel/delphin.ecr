@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
-using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -17,7 +16,6 @@ namespace Delphin
 
         public bool Connect(int port, int speed = 115200)
         {
-
             try
             {
                 sP = new SerialPort("COM" + port, speed, Parity.None, 8, StopBits.One);
@@ -33,6 +31,7 @@ namespace Delphin
                 sP.Open();
                 if (sP.IsOpen == true)
                 {
+                    if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
                     return true;
                 }
                 return false;
@@ -73,6 +72,8 @@ namespace Delphin
 
         public bool Beep(int tone, int len)
         {
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
+
             byte[] sendBytes = { 80 };
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(tone.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
@@ -89,6 +90,8 @@ namespace Delphin
 
         public PLU ReadPlu(int pluCode)
         {
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
+
             byte[] sendBytes = { 107, 82, 09 };
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(pluCode.ToString())).ToArray(); // 31h
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
@@ -119,6 +122,8 @@ namespace Delphin
 
         public bool DeletingPlu(int firstPlu, int lastPlu)
         {
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
+
             byte[] sendBytes = { 107, 104, 09 };
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(firstPlu.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
@@ -139,6 +144,7 @@ namespace Delphin
         public bool WritePlu(   int plu, byte taxGr, byte dep, byte group, byte priceType, double price, double addQty,
                                 double quantity, string bar1, string bar2, string bar3, string bar4, string name, int connectedPLU)
         {
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
 
             byte[] sendBytes = { 107, 80, 09 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(plu.ToString())).ToArray();
@@ -207,6 +213,8 @@ namespace Delphin
 
         public string GetDataTime()
         {
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
+
             byte[] sendBytes = {62};
 
             if (Send(sendBytes))
@@ -224,7 +232,9 @@ namespace Delphin
         /// <param name="dataTime"> DateTime - Date and time in format: DD-MM-YY hh:mm:ss DST </param>
         /// <returns></returns>
         public bool SetDataTime(string dataTime)
-        {  
+        {
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
+
             byte[] sendBytes = { 61 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dataTime)).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
@@ -239,6 +249,8 @@ namespace Delphin
 
         public List<string> SearchReceipt(string dateIn, string dateOut)
         {
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
+
             byte[] sendBytes = {124};
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dateIn)).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
@@ -259,6 +271,8 @@ namespace Delphin
 
         public int GetLastDocNumber()
         {
+
+
             byte[] sendBytes = { 124, 09, 09 };
 
             if (Send(sendBytes))
@@ -303,6 +317,8 @@ namespace Delphin
         /// <returns>Список строк документа. В случаее ошибки вернет NULL.</returns>
         public List<string> GetDocTxtByNum(int num)
         {
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
+
             List<string> ekl = new List<string>();
             if(SetDocForRead(num))
             {

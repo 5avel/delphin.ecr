@@ -20,7 +20,7 @@ namespace Delphin
 
 
         private byte[] SEP = { 9 };
-        private byte[] answer = new byte[256];
+        private byte[] answer;
         private int answerlenght = 0;
 
 
@@ -71,14 +71,20 @@ namespace Delphin
 
             sP.Write(ret, 0, ret.Length);
 
-            WaitinпAnswer();
+            WaitingAnswer();
             if (answerlenght > 8 && answer[5] == 80)
+            {
                 return true;
-
+            }
+            else
+            {
+                Console.WriteLine("ERROR -" + BitConverter.ToString(answer));
+                Console.WriteLine("ERROR -" + ASCIIEncoding.ASCII.GetString(answer));
+            }
             return false;
         }
 
-        private void WaitinпAnswer()
+        private void WaitingAnswer()
         {
             long t = Environment.TickCount;
             while (!isAnfer) // цикл ожидания ответа с СОМ порта
@@ -164,9 +170,10 @@ namespace Delphin
                 s += i.ToString();
                 s += i.ToString();
                 s += i.ToString();
-                s += i.ToString();
+                //s += i.ToString();
                 j *= 10;
                 j += 81;
+                j += 4601;
                 s += j.ToString();
                 if (s != lStr[10]) return DateTime.MinValue;
 
