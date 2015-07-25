@@ -330,6 +330,26 @@ namespace Delphin
             return 0;
         }
 
+        public List<string> SearchReceipt(string dateIn, string dateOut)
+        {
+            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 52, 09, };
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dateIn)).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dateOut)).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            if (Send(sendBytes))
+            {
+                //Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
+                //  Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
+                List<string> lAnswer = Separating();
+                if (lAnswer.Count == 4)
+                {
+                    return lAnswer;
+                }
+            }
+            return null;
+        }
+
         /// <summary>
         /// Возвращает номер первого документа на заданный диапазон дат.
         /// </summary>
