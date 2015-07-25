@@ -28,14 +28,10 @@ namespace ConsoleApplication1
 
             //Console.WriteLine(p1.Name + "  " + p2.Name + "  " + p3.Name + "  " + p4.Name + "  ");
 
-            Console.WriteLine(ecr.GetLastDocNumber());
+            Console.WriteLine(ecr.GetCheckByNum(3));
 
-             List<string> list = ecr.SearchReceipt("25-07-15 00:00:00 DST", "25-07-15 23:00:00 DST");
+             
 
-             Console.WriteLine(list[0]);
-             Console.WriteLine(list[1]);
-             Console.WriteLine(list[2]);
-             Console.WriteLine(list[3]);
 
             Console.ReadKey();
             Console.WriteLine(ecr.Disconnect());

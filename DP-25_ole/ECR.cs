@@ -80,7 +80,10 @@ namespace Delphin
             sendBytes = sendBytes.Concat(SEP).ToArray();
 
             if (Send(sendBytes))
+            {
+                Thread.Sleep(100);
                 return true;
+            }
             return false;
         }
 
@@ -116,7 +119,6 @@ namespace Delphin
 
         public bool DeletingPlu(int firstPlu, int lastPlu)
         {
-
             byte[] sendBytes = { 107, 104, 09 };
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(firstPlu.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
@@ -234,28 +236,6 @@ namespace Delphin
             return false;
         }
 
-        /// <summary>
-        /// Возвращает номер последнего документа в ЭКЛ.(включая не фмскальные документы.)
-        /// </summary>
-        /// <returns> int - номер документа.</returns>
-        public int GetLastDocNumber()
-        {
-            byte[] sendBytes = { 124, 09, 09};
-
-            if (Send(sendBytes))
-            {
-                //Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
-              //  Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
-                List<string> lAnswer = Separating();
-                if(lAnswer.Count == 4)
-                {
-                    return Convert.ToInt32(lAnswer[3]);
-                }
-                
-                return 0;
-            }
-            return 0;
-        }
 
         public List<string> SearchReceipt(string dateIn, string dateOut)
         {
@@ -277,6 +257,23 @@ namespace Delphin
             return null;
         }
 
+        public int GetLastDocNumber()
+        {
+            byte[] sendBytes = { 124, 09, 09 };
+
+            if (Send(sendBytes))
+            {
+                //Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
+                //  Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
+                List<string> lAnswer = Separating();
+                if (lAnswer.Count == 4)
+                {
+                    return Convert.ToInt32(lAnswer[3]);
+                }
+            }
+            return 0;
+        }
+
         /// <summary>
         /// Возвращает номер первого документа на заданный диапазон дат.
         /// </summary>
@@ -285,45 +282,8 @@ namespace Delphin
         /// <returns></returns>
         public int GetFirstDocNumberByDate(string dateIn, string dateOut)
         {
-            if (client.Connected == false) return 0; // состояние соединенияя
-            int maxDocNum = GetLastDocNumber();
-            DateTime dt;
-            DateTime dtIn = DateTime.Parse(dateIn);
-            DateTime dtOut = DateTime.Parse(dateOut+" 23:59:59");
-            DateTime dtFirstDoc = GetDateDocByDocNum(1);
-
-            // первый документ входит в диапозон
-            if (dtFirstDoc < dtOut && dtFirstDoc > dtIn) return 1;
-            
-            // Поиск раньше первого документа
-            if (dtFirstDoc > dtIn) return 0;
-            
-            int ret = 0;
-            int step = 10;
-            bool flag = true;
-            for (int i = maxDocNum; i >= 0; i -= step)
-            {
-                dt = GetDateDocByDocNum(i);
-                if (dt < dtIn)
-                {
-                    if (flag)
-                    {
-                        i += step;
-                        step = 1;
-                        flag = false;
-                    }
-                    else
-                    {
-                        dt = GetDateDocByDocNum(i+1);
-                        if(dt < dtOut && dt > dtIn)
-                        {
-                            ret = i + 1;
-                        }
-                        break;
-                    }
-                }
-            }
-            return ret;
+            List<string> lAnswer = SearchReceipt(dateIn + " DST", dateOut + " DST");
+            return Convert.ToInt32(lAnswer[2]);
         }
 
         /// <summary>
@@ -343,8 +303,6 @@ namespace Delphin
         /// <returns>Список строк документа. В случаее ошибки вернет NULL.</returns>
         public List<string> GetDocTxtByNum(int num)
         {
-            if (client.Connected == false) return null; // состояние соединенияя
-
             List<string> ekl = new List<string>();
             if(SetDocForRead(num))
             {
@@ -366,23 +324,21 @@ namespace Delphin
         /// <param name="docNumber"></param>
         /// <returns>Chech - объект чека, или null</returns>
         public Check GetCheckByNum(int docNumber)
-        {// 125 | 1 | docNum
-            if (client.Connected == false) return null; // состояние соединенияя
-
-            //if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
+        {
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null;
 
             if (SetDocForRead(docNumber))
             {
                 List<string> lStr = Separating();
                 var dt = DateTime.Parse(lStr[1].Remove(16));
                 int zNum = Int32.Parse(lStr[3]); // Номер Z-отчета
-                byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 50, 09 };
+                byte[] sendBytes = { 125, 50, 09 };
                 sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
                 sendBytes = sendBytes.Concat(SEP).ToArray();
                 Check c = null;
                 while (Send(sendBytes))
                 {
-                    string s = ASCIIEncoding.ASCII.GetString(answer, 8, answerlenght - 9);
+                    string s = ASCIIEncoding.ASCII.GetString(answer, 7, answerlenght - 61);
                     byte[] buf = Convert.FromBase64String(s); // расшифровонная строка
                     //Console.WriteLine(BitConverter.ToString(buf)+"\n");
                     
@@ -391,11 +347,11 @@ namespace Delphin
                     {
                         if (buf[4] == 0) // Чек
                         {
-                            c = new Check(dt, BitConverter.ToUInt32(buf, 8), zNum);
+                            c = new Check(dt, BitConverter.ToUInt32(buf, 7), zNum);
                         }
                         else if (buf[4] == 1) // Возвратный Чек
                         {
-                            c = new Check(dt, BitConverter.ToUInt32(buf, 8), zNum, true);
+                            c = new Check(dt, BitConverter.ToUInt32(buf, 7), zNum, true);
                         }
                     }
                     else if (buf[0] == 01 && c != null) // Продажа
@@ -527,11 +483,10 @@ namespace Delphin
         /// <returns>string - одна строка из документа</returns>
         public string ReadDocStr(int docNumber)
         {// 125 | 1 | docNum
-            if (client.Connected == false) return null; // состояние соединенияя
 
             if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
 
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 49, 09 };
+            byte[] sendBytes = { 125, 49, 09 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             if (Send(sendBytes))

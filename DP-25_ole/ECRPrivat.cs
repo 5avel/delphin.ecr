@@ -13,14 +13,12 @@ namespace Delphin
         #region Private Field
 
         internal SerialPort sP;
-        internal TcpClient client = null; // d
 
         internal bool isAnfer = false; // есть ответ
         internal byte cNum = 32; // порядковый номер соосбщения
 
 
-        private NetworkStream tcpStream = null;
-        private byte logNum = 0;
+
         private byte[] SEP = { 9 };
         private byte[] answer = new byte[256];
         private int answerlenght = 0;
@@ -135,7 +133,7 @@ namespace Delphin
         /// <returns>bool</returns>
         private bool SetDocForRead(int docNumber)
         {// 125 | 1 | docNum
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 48, 09 };
+            byte[] sendBytes = { 125, 48, 09 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             if (Send(sendBytes))
@@ -152,7 +150,7 @@ namespace Delphin
         /// <returns>DateTime - Дата документа.</returns>
         public DateTime GetDateDocByDocNum(int docNumber)
         {
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 48, 09 };
+            byte[] sendBytes = { 125, 48, 09 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             if (Send(sendBytes))
