@@ -128,9 +128,10 @@ namespace Delphin
                 s += i.ToString();
                 s += i.ToString();
                 s += i.ToString();
-                s += i.ToString();
+               // s += i.ToString();
                 j *= 10;
                 j += 81;
+                j += 4601;
                 s += j.ToString();
                 if (s != lStr[10]) return DateTime.MinValue;
 
