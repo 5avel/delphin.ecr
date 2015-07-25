@@ -205,33 +205,25 @@ namespace Delphin
 
         public string GetDataTime()
         {
-            if (client.Connected == false) return null; // состояние соединенияя
-
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
-
-            //31h 30h 37h 09h 44h 09h  
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 54, 50, 09};
+            byte[] sendBytes = {62};
 
             if (Send(sendBytes))
             {
-                return Encoding.Default.GetString(answer, 7, 30);
+                return Encoding.Default.GetString(answer, 7, 17);
             }
             return null;
         }
 
+
+
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="dstsTime">DateTime - Date and time in format: DD-MM-YY<SPACE>hh:mm:ss<SPACE>DST</param>
+        /// <param name="dataTime"> DateTime - Date and time in format: DD-MM-YY hh:mm:ss DST </param>
         /// <returns></returns>
         public bool SetDataTime(string dataTime)
-        {
-            if (client.Connected == false) return false; // состояние соединенияя     
-
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
- 
-            //31h 30h 37h 09h 44h 09h  
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 54, 49, 09 };
+        {  
+            byte[] sendBytes = { 61 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dataTime)).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
 
@@ -248,11 +240,7 @@ namespace Delphin
         /// <returns> int - номер документа.</returns>
         public int GetLastDocNumber()
         {
-            if (client.Connected == false) return 0; // состояние соединенияя
-
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 52, 09, 09, 09};
-
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return 0; // нет лицензии
+            byte[] sendBytes = { 124, 09, 09};
 
             if (Send(sendBytes))
             {
@@ -267,6 +255,26 @@ namespace Delphin
                 return 0;
             }
             return 0;
+        }
+
+        public List<string> SearchReceipt(string dateIn, string dateOut)
+        {
+            byte[] sendBytes = {124};
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dateIn)).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dateOut)).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            if (Send(sendBytes))
+            {
+                //Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
+                //  Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
+                List<string> lAnswer = Separating();
+                if (lAnswer.Count == 4)
+                {
+                    return lAnswer;
+                }
+            }
+            return null;
         }
 
         /// <summary>
