@@ -10,7 +10,7 @@ namespace Delphin
             ecr = new ECR();
         }
 
-        public bool Connect(int port, int speed)
+        public bool Connect(int port, int speed = 115200, int logNum = 1)
         {
             return ecr.Connect(port, speed);
         }

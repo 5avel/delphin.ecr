@@ -14,7 +14,7 @@ namespace Delphin
 
 #region Public methods
 
-        public bool Connect(int port, int speed = 115200)
+        public bool Connect(int port, int speed = 115200, int logNum = 1)
         {
             try
             {
@@ -296,7 +296,7 @@ namespace Delphin
         /// <returns></returns>
         public int GetFirstDocNumberByDate(string dateIn, string dateOut)
         {
-            List<string> lAnswer = SearchReceipt(dateIn + " DST", dateOut + " DST");
+            List<string> lAnswer = SearchReceipt(dateIn + " 00:00:00 DST", dateOut + " 23:59:59 DST");
             return Convert.ToInt32(lAnswer[2]);
         }
 
@@ -307,7 +307,7 @@ namespace Delphin
         /// <returns></returns>
         public int GetFirstDocNumberByDate(string date)
         {
-            return GetFirstDocNumberByDate(date+" 00:00:00", date+" 23:59:59");
+            return GetFirstDocNumberByDate(date, date);
         }
 
         /// <summary>

@@ -78,8 +78,8 @@ namespace Delphin
             }
             else
             {
-                Console.WriteLine("ERROR -" + BitConverter.ToString(answer));
-                Console.WriteLine("ERROR -" + ASCIIEncoding.ASCII.GetString(answer));
+              //  Console.WriteLine("ERROR -" + BitConverter.ToString(answer));
+               // Console.WriteLine("ERROR -" + ASCIIEncoding.ASCII.GetString(answer));
             }
             return false;
         }
@@ -100,9 +100,9 @@ namespace Delphin
             if (isAnfer)
             {
 
-                Console.WriteLine("Data Received:");
-                Console.WriteLine(BitConverter.ToString(answer));
-                Console.WriteLine();
+                //Console.WriteLine("Data Received:");
+                //Console.WriteLine(BitConverter.ToString(answer));
+                //Console.WriteLine();
             }
             isAnfer = false;
         }
