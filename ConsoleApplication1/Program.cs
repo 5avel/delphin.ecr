@@ -110,8 +110,8 @@ namespace ConsoleApplication1
             //}
 
 
-            ecr1c.DataSalesFrom = "25-07-15";
-            ecr1c.DataSalesTo = "25-07-15";
+            ecr1c.DataSalesFrom = "28-07-15";
+            ecr1c.DataSalesTo = "28-07-15";
             while (ecr1c.GetCheck())
             {
                 Console.WriteLine("\n Чек - " + ecr1c.JCheckNum + "  Дата - " + ecr1c.JCheckDate + "\n  Скидка на чек " + ecr1c.JCheckDis + "%" + " Возврат - " + ecr1c.JCheckIsReturn + " Отменен -" + ecr1c.JCheckIsVoid + " Z -" + ecr1c.JCheckNumZRep);

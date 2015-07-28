@@ -358,45 +358,13 @@ namespace Delphin
         /// <returns></returns>
         public int GetFirstDocNumberByDate(string dateIn, string dateOut)
         {
-            if (client.Connected == false) return 0; // состояние соединенияя
-            int maxDocNum = GetLastDocNumber();
-            DateTime dt;
-            DateTime dtIn = DateTime.Parse(dateIn);
-            DateTime dtOut = DateTime.Parse(dateOut+" 23:59:59");
-            DateTime dtFirstDoc = GetDateDocByDocNum(1);
+            List<string> lS = SearchReceipt(dateIn + " 00:00:00 DST", dateOut+" 23:59:59 DST");
 
-            // первый документ входит в диапозон
-            if (dtFirstDoc < dtOut && dtFirstDoc > dtIn) return 1;
-            
-            // Поиск раньше первого документа
-            if (dtFirstDoc > dtIn) return 0;
-            
-            int ret = 0;
-            int step = 10;
-            bool flag = true;
-            for (int i = maxDocNum; i >= 0; i -= step)
+            if (lS != null)
             {
-                dt = GetDateDocByDocNum(i);
-                if (dt < dtIn)
-                {
-                    if (flag)
-                    {
-                        i += step;
-                        step = 1;
-                        flag = false;
-                    }
-                    else
-                    {
-                        dt = GetDateDocByDocNum(i+1);
-                        if(dt < dtOut && dt > dtIn)
-                        {
-                            ret = i + 1;
-                        }
-                        break;
-                    }
-                }
+                return Convert.ToInt32(lS[2]);
             }
-            return ret;
+            return 0;
         }
 
         /// <summary>
