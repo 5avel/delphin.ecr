@@ -354,7 +354,7 @@ namespace Delphin
                 Check c = null;
                 while (Send(sendBytes))
                 {
-                    string s = ASCIIEncoding.ASCII.GetString(answer, 7, answerlenght - 61);
+                    string s = ASCIIEncoding.ASCII.GetString(answer, 7, answerlenght - 20);
                     byte[] buf = Convert.FromBase64String(s); // расшифровонная строка
                     //Console.WriteLine(BitConverter.ToString(buf)+"\n");
                     
@@ -410,7 +410,7 @@ namespace Delphin
                             {
                                 double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
 
-                                double test = Convert.ToDouble(BitConverter.ToUInt64(buf, 24)) / 100;
+                                //double test = Convert.ToDouble(BitConverter.ToUInt64(buf, 24)) / 100;
                                 // скидка на последний товар, на текущий момент.
                                 c.goods.Last<Good>().discSurc = -proc;
 
