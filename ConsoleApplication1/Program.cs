@@ -15,12 +15,16 @@ namespace ConsoleApplication1
 
             Console.WriteLine(ecr1c.Connect(3, 115200));
 
-            //ecr.Beep(1000, 1000);
+            // ecr1c.Beep(1000, 1000);
+
+            //  Console.WriteLine(ecr1c.ReadArticul(1));
+
+            //  Console.WriteLine(ecr1c.ArtName);
 
             //PLU p1 = ecr.ReadPlu(1);
             //PLU p2 = ecr.ReadPlu(2);
             //PLU p3 = ecr.ReadPlu(3);
-            
+
 
             //ecr.WritePlu(4, 1, 15.55, "Ура работает");
 
@@ -28,8 +32,8 @@ namespace ConsoleApplication1
 
             //Console.WriteLine(p1.Name + "  " + p2.Name + "  " + p3.Name + "  " + p4.Name + "  ");
 
-            ecr1c.DataSalesFrom = "28-07-15";
-            ecr1c.DataSalesTo = "28-07-15";
+            ecr1c.DataSalesFrom = "10-08-15";
+            ecr1c.DataSalesTo = "10-08-15";
             while (ecr1c.GetCheck())
             {
                 Console.WriteLine("\n Чек - " + ecr1c.JCheckNum + "  Дата - " + ecr1c.JCheckDate + "\n  Скидка на чек " + ecr1c.JCheckDis + "%" + " Возврат - " + ecr1c.JCheckIsReturn + " Отменен -" + ecr1c.JCheckIsVoid + " Z -" + ecr1c.JCheckNumZRep);
@@ -50,7 +54,7 @@ namespace ConsoleApplication1
 
             }
 
-             
+
 
 
             Console.ReadKey();
