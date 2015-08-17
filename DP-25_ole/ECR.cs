@@ -354,7 +354,7 @@ namespace Delphin
                 Check c = null;
                 while (Send(sendBytes))
                 {
-                    string s = ASCIIEncoding.ASCII.GetString(answer, 7, answerlenght - 20);
+                    string s = ASCIIEncoding.ASCII.GetString(answer, 7, answerlenght - 21);
                     byte[] buf = Convert.FromBase64String(s); // расшифровонная строка
                     //Console.WriteLine(BitConverter.ToString(buf)+"\n");
                     
@@ -363,11 +363,11 @@ namespace Delphin
                     {
                         if (buf[4] == 0) // Чек
                         {
-                            c = new Check(dt, BitConverter.ToUInt32(buf, 7), zNum);
+                            c = new Check(dt, BitConverter.ToUInt32(buf, 8), zNum);
                         }
                         else if (buf[4] == 1) // Возвратный Чек
                         {
-                            c = new Check(dt, BitConverter.ToUInt32(buf, 7), zNum, true);
+                            c = new Check(dt, BitConverter.ToUInt32(buf, 8), zNum, true);
                         }
                     }
                     else if (buf[0] == 01 && c != null) // Продажа
@@ -409,6 +409,8 @@ namespace Delphin
                             else if (buf[6] == 02) // скидка
                             {
                                 double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
+                                double sum = c.goods.Last<Good>().sum;
+                                c.goods.Last<Good>().discSum = ((sum / 100.0) * proc);
 
                                 //double test = Convert.ToDouble(BitConverter.ToUInt64(buf, 24)) / 100;
                                 // скидка на последний товар, на текущий момент.

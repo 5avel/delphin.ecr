@@ -206,6 +206,7 @@ namespace Delphin
         public double JArtQnt { private set; get; }
         public double JArtSum { private set; get; }
         public double JArtDis { private set; get; }
+        public double JArtDisSum { private set; get; }
         public string JArtName { private set; get; }
 
         public bool ReadSales()
@@ -220,6 +221,7 @@ namespace Delphin
                 JArtQnt = check.goods[CurentCheckLine].quantity;
                 JArtSum = check.goods[CurentCheckLine].sum;
                 JArtDis = check.goods[CurentCheckLine].discSurc;
+                JArtDisSum = check.goods[CurentCheckLine].discSum;
                 JArtName = check.goods[CurentCheckLine].name;
 
                 ++CurentCheckLine;

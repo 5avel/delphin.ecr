@@ -10,6 +10,7 @@ namespace Delphin
         public double quantity { get; set; }
         public double sum { get; set; }
         public double discSurc { get; set; }
+        public double discSum { get; set; }
         public string name { get; set; }
         public bool isVoid { get; set; }
 
