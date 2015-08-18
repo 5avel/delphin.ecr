@@ -9,7 +9,7 @@ using System.Threading;
 namespace Delphin
 {
     
-    public partial class ECR : IECR
+    public partial class ECRrs232 : IECR
     {
         #region Private Field
 

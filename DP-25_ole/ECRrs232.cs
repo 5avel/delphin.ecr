@@ -9,7 +9,7 @@ using System.Threading;
 namespace Delphin
 {
     [Guid("a0cc9128-46fc-4bf7-a2b8-76d1e81ae686"), ClassInterface(ClassInterfaceType.None), ComSourceInterfaces(typeof(IEvents))]
-    public partial class ECR : IECR
+    public partial class ECRrs232 : IECR
     {
 
 #region Public methods
