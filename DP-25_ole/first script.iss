@@ -38,7 +38,7 @@ Source: "C:\GIT\delphin.ecr\DP-25_ole\bin\Debug\DP-25_tcp_com.tlb"; DestDir: "{a
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 
 [Run] 
-; v2.0.50727 {FrameWorkName} 
+; v4.0.30319 {FrameWorkName} 
 ; 32 bit stuff 
 Filename: {win}\Microsoft.NET\Framework\{code:FrameWorkName}\RegAsm.exe; Parameters: " ""{app}\DP-25_tcp_com.dll"" /codebase /tlb"; WorkingDir: {app}; MinVersion: 0,5.0.2195 
 ;Filename: {win}\Microsoft.NET\Framework\{code:FrameWorkName}\gacutil.exe; Parameters: /i {app}\My Prog.dll; WorkingDir: {app}; MinVersion: 0,5.0.2195 
@@ -66,7 +66,7 @@ end;
  
 function FrameWorkName(Param: String): String; 
 begin 
-  Result := 'v2.0.50727'; 
+  Result := 'v4.0.30319'; 
 end; 
  
 function FrameWorkName_(Param: String): String; 
