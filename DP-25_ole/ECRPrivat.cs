@@ -4,6 +4,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace Delphin
 {
@@ -71,7 +72,8 @@ namespace Delphin
 
             sP.Write(ret, 0, ret.Length);
 
-            WaitingAnswer();
+            if (!WaitingAnswer()) return false; // 
+
             if (answerlenght > 8 && answer[5] == 80)
             {
                 return true;
@@ -84,27 +86,43 @@ namespace Delphin
             return false;
         }
 
-        private void WaitingAnswer()
+        /// <summary>
+        /// Событие появления во входном буфере данных.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
+        {
+            Thread.Sleep(5); // задежка, что бы дать устройству время дописать сообщение
+            SerialPort sp = (SerialPort)sender;
+            answerlenght = sp.BytesToRead;
+            answer = new byte[answerlenght];
+            sp.Read(answer, 0, answerlenght);
+            isAnfer = true;
+        }
+
+        private bool WaitingAnswer()
         {
             long t = Environment.TickCount;
             while (!isAnfer) // цикл ожидания ответа с СОМ порта
             {
 
-                if ((Environment.TickCount - t) > 500)
+                if ((Environment.TickCount - t) > 1000)
                 {
-                    Console.WriteLine("Таймаут 500мс");
+                    Console.WriteLine("Таймаут 1000мс");
                     break;
                 }
             }
 
-            if (isAnfer)
+            if (isAnfer) // есть ответ
             {
-
-                //Console.WriteLine("Data Received:");
-                //Console.WriteLine(BitConverter.ToString(answer));
-                //Console.WriteLine();
+                isAnfer = false;
+                return true;
             }
+
             isAnfer = false;
+            return false; // 
+            
         }
 
         /// <summary>

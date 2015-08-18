@@ -43,21 +43,6 @@ namespace Delphin
             }
         }
 
-        /// <summary>
-        /// Событие появления во входном буфере данных.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
-        {
-            Thread.Sleep(5); // задежка, что бы дать устройству премя дописать сообщение
-            SerialPort sp = (SerialPort)sender;
-            answerlenght = sp.BytesToRead;
-            answer = new byte[answerlenght];
-            sp.Read(answer, 0, answerlenght);
-            isAnfer = true;
-        }
-
         public bool Disconnect()
         {
             if (sP.IsOpen == true)
@@ -297,6 +282,9 @@ namespace Delphin
         public int GetFirstDocNumberByDate(string dateIn, string dateOut)
         {
             List<string> lAnswer = SearchReceipt(dateIn + " 00:00:00 DST", dateOut + " 23:59:59 DST");
+
+            if (lAnswer == null) return 0; // нет чеков на дату
+
             return Convert.ToInt32(lAnswer[2]);
         }
 
