@@ -13,16 +13,8 @@ namespace Delphin
 
 #region Public methods
 
-        public bool Connect(string ip, int port, int logNum)
+        public bool Connect(string ip, int port, int logNum = 1)
         {
-            if(logNum>0|| logNum<100)
-            {
-                this.logNum = logNum;
-            }
-            else
-            {
-                return false;
-            }
             try
             {
                 client = new TcpClient();

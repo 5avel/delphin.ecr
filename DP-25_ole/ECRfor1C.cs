@@ -10,10 +10,17 @@ namespace Delphin
             
         }
 
-        public bool Connect(string port, int speed = 115200, int logNum = 1)
+        public bool Connect(string port, int speed = 115200, bool isRS232 = true )
         {
-            ecr = new ECRrs232();
-            return ecr.Connect(port, speed, logNum);
+            if (isRS232)
+            {
+                ecr = new ECRrs232();
+            }
+            else
+            {
+                ecr = new ECRether();
+            }
+            return ecr.Connect(port, speed, 1);
         }
 
         public bool Disconnect()
