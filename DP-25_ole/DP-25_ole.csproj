@@ -50,6 +50,8 @@
     <Reference Include="System.Data.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ECRetherPrivat.cs" />
+    <Compile Include="ECRether.cs" />
     <Compile Include="ECRrs232.cs" />
     <Compile Include="ECRfor1C.cs" />
     <Compile Include="ECRrs232Privat.cs" />

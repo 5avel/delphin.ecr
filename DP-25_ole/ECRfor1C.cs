@@ -4,15 +4,16 @@ namespace Delphin
 {
     public class ECRfor1C
     {
-        private ECRrs232 ecr;
+        private IECR ecr;
         public ECRfor1C()  // Реализовать сингтон
         {
-            ecr = new ECRrs232();
+            
         }
 
-        public bool Connect(int port, int speed = 115200, int logNum = 1)
+        public bool Connect(string port, int speed = 115200, int logNum = 1)
         {
-            return ecr.Connect(port, speed);
+            ecr = new ECRrs232();
+            return ecr.Connect(port, speed, logNum);
         }
 
         public bool Disconnect()

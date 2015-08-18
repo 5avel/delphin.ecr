@@ -1,42 +1,74 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO.Ports;
 using System.Linq;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
 
 namespace Delphin
 {
-    [Guid("a0cc9128-46fc-4bf7-a2b8-76d1e81ae686"), ClassInterface(ClassInterfaceType.None), ComSourceInterfaces(typeof(IEvents))]
-    public partial class ECRrs232 : IECR
+    [Guid("a0cc9128-46fc-4bf7-a2b8-76d1e81ae687"), ClassInterface(ClassInterfaceType.None), ComSourceInterfaces(typeof(IEvents))]
+    public partial class ECRether : IECR
     {
 
 #region Public methods
 
-        public bool Connect(string port, int speed = 115200, int logNum = 1)
+        public bool Connect(string ip, int port, int logNum)
         {
-            try
+            if(logNum>0|| logNum<100)
             {
-                sP = new SerialPort("COM" + port, speed, Parity.None, 8, StopBits.One);
-                sP.WriteTimeout = 500; sP.ReadTimeout = 500;
-
-                Thread.Sleep(200);
-
-                sP.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
-
-                if (sP.IsOpen == true)
-                    sP.Close();
-
-                sP.Open();
-                if (sP.IsOpen == true)
-                {
-                    if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
-                    return true;
-                }
+                this.logNum = logNum;
+            }
+            else
+            {
                 return false;
             }
-            catch (Exception ex)
+            try
+            {
+                client = new TcpClient();
+                client.Connect(ip, port); // Соединяемся с сервером
+                if (client.Connected)
+                {
+                    tcpStream = client.GetStream();
+                    byte[] sendBytes = { 5, 5, 1, 0, 1, 0 }; // Open SET
+                    tcpStream.Write(sendBytes, 0, sendBytes.Length);
+
+                    byte[] bytes = new byte[client.ReceiveBufferSize];
+                    int bytesRead = tcpStream.Read(bytes, 0, client.ReceiveBufferSize);
+                    if (bytesRead > 0)
+                    {
+                        if (bytes[5] == 00)
+                        {
+                            if (DateTime.MinValue == GetDateDocByDocNum(1))
+                            {
+                                Disconnect();
+                                return false;
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                        }
+                        else if (bytes[5] == 02)
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    else 
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch(SocketException ex)
             {
                 Console.WriteLine("Exception: " + ex.ToString());
                 return false;
@@ -45,43 +77,71 @@ namespace Delphin
 
         public bool Disconnect()
         {
-            if (sP.IsOpen == true)
-                sP.Close();
-
-            if (sP.IsOpen == false)
+            try
             {
-                return true;
+                if (client.Connected)
+                {
+                    tcpStream = client.GetStream();
+                    byte[] sendBytes = { 5, 5, 2, 0, 1, 0 }; // Close SET
+                    tcpStream.Write(sendBytes, 0, sendBytes.Length);
+
+                    byte[] bytes = new byte[client.ReceiveBufferSize];
+                    int bytesRead = tcpStream.Read(bytes, 0, client.ReceiveBufferSize);
+                    if (bytesRead > 0)
+                    {
+                        if (bytes[5] == 00)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
             }
-            return false;
+            catch (SocketException ex)
+            {
+                Console.WriteLine("Exception: " + ex.ToString());
+                return false;
+            }
+            finally
+            {
+                client.Close();
+            }
         }
 
         public bool Beep(int tone, int len)
         {
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
+            if (client.Connected == false) return false; // состояние соединенияя
 
-            byte[] sendBytes = { 80 };
+            byte[] sendBytes = { 05, 17, 00, 1, 00, 56, 48, 09 };
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(tone.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(len.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
-
-            if (Send(sendBytes))
-            {
-                Thread.Sleep(100);
-                return true;
-            }
-            return false;
+            return Send(sendBytes);
         }
 
         public PLU ReadPlu(int pluCode)
         {
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
+            if (client.Connected == false) return null; // состояние соединенияя
 
-            byte[] sendBytes = { 107, 82, 09 };
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
+                                                                       // R
+                                                       //31h 30h 37h 09h 52h 09h  
+            byte[] sendBytes = { 05, 17, 00, 1, 00, 49, 48, 55, 09, 82, 09 };
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(pluCode.ToString())).ToArray(); // 31h
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
-    
-            if (Send(sendBytes))
+            if(Send(sendBytes) && answerlenght > 8)
             {
                 PLU plu = new PLU();
                 List<string> lPlu = Separating();
@@ -107,9 +167,13 @@ namespace Delphin
 
         public bool DeletingPlu(int firstPlu, int lastPlu)
         {
+            if (client.Connected == false) return false; // состояние соединенияя
+
             if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
 
-            byte[] sendBytes = { 107, 104, 09 };
+                                                                       // D
+                                                       //31h 30h 37h 09h 44h 09h  
+            byte[] sendBytes = { 05, 17, 00, 1, 00, 49, 48, 55, 09, 68, 09 };
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(firstPlu.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(lastPlu.ToString())).ToArray();
@@ -129,9 +193,13 @@ namespace Delphin
         public bool WritePlu(   int plu, byte taxGr, byte dep, byte group, byte priceType, double price, double addQty,
                                 double quantity, string bar1, string bar2, string bar3, string bar4, string name, int connectedPLU)
         {
+            if (client.Connected == false) return false; // состояние соединенияя
+
             if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
 
-            byte[] sendBytes = { 107, 80, 09 };
+                                                                       // P
+                                                       //31h 30h 37h 09h 50h 09h  
+            byte[] sendBytes = { 05, 17, 00, 1, 00, 49, 48, 55, 09, 80, 09 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(plu.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(taxGr.ToString())).ToArray();
@@ -198,29 +266,33 @@ namespace Delphin
 
         public string GetDataTime()
         {
+            if (client.Connected == false) return null; // состояние соединенияя
+
             if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
 
-            byte[] sendBytes = {62};
+            //31h 30h 37h 09h 44h 09h  
+            byte[] sendBytes = { 05, 17, 00, 1, 00, 54, 50, 09};
 
             if (Send(sendBytes))
             {
-                return Encoding.Default.GetString(answer, 7, 17);
+                return Encoding.Default.GetString(answer, 7, 30);
             }
             return null;
         }
 
-
-
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="dataTime"> DateTime - Date and time in format: DD-MM-YY hh:mm:ss DST </param>
+        /// <param name="dstsTime">DateTime - Date and time in format: DD-MM-YY<SPACE>hh:mm:ss<SPACE>DST</param>
         /// <returns></returns>
         public bool SetDataTime(string dataTime)
         {
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
+            if (client.Connected == false) return false; // состояние соединенияя     
 
-            byte[] sendBytes = { 61 };
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
+ 
+            //31h 30h 37h 09h 44h 09h  
+            byte[] sendBytes = { 05, 17, 00, 1, 00, 54, 49, 09 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dataTime)).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
 
@@ -231,12 +303,36 @@ namespace Delphin
             return false;
         }
 
+        /// <summary>
+        /// Возвращает номер последнего документа в ЭКЛ.(включая не фмскальные документы.)
+        /// </summary>
+        /// <returns> int - номер документа.</returns>
+        public int GetLastDocNumber()
+        {
+            if (client.Connected == false) return 0; // состояние соединенияя
+
+            byte[] sendBytes = { 05, 17, 00, 1, 00, 49, 50, 52, 09, 09, 09};
+
+            if (DateTime.MinValue == GetDateDocByDocNum(1)) return 0; // нет лицензии
+
+            if (Send(sendBytes))
+            {
+                //Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
+              //  Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
+                List<string> lAnswer = Separating();
+                if(lAnswer.Count == 4)
+                {
+                    return Convert.ToInt32(lAnswer[3]);
+                }
+                
+                return 0;
+            }
+            return 0;
+        }
 
         public List<string> SearchReceipt(string dateIn, string dateOut)
         {
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
-
-            byte[] sendBytes = {124};
+            byte[] sendBytes = { 05, 17, 00, 1, 00, 49, 50, 52, 09, };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dateIn)).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dateOut)).ToArray();
@@ -254,25 +350,6 @@ namespace Delphin
             return null;
         }
 
-        public int GetLastDocNumber()
-        {
-
-
-            byte[] sendBytes = { 124, 09, 09 };
-
-            if (Send(sendBytes))
-            {
-                //Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
-                //  Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
-                List<string> lAnswer = Separating();
-                if (lAnswer.Count == 4)
-                {
-                    return Convert.ToInt32(lAnswer[3]);
-                }
-            }
-            return 0;
-        }
-
         /// <summary>
         /// Возвращает номер первого документа на заданный диапазон дат.
         /// </summary>
@@ -281,11 +358,13 @@ namespace Delphin
         /// <returns></returns>
         public int GetFirstDocNumberByDate(string dateIn, string dateOut)
         {
-            List<string> lAnswer = SearchReceipt(dateIn + " 00:00:00 DST", dateOut + " 23:59:59 DST");
+            List<string> lS = SearchReceipt(dateIn + " 00:00:00 DST", dateOut+" 23:59:59 DST");
 
-            if (lAnswer == null) return 0; // нет чеков на дату
-
-            return Convert.ToInt32(lAnswer[2]);
+            if (lS != null)
+            {
+                return Convert.ToInt32(lS[2]);
+            }
+            return 0;
         }
 
         /// <summary>
@@ -295,7 +374,7 @@ namespace Delphin
         /// <returns></returns>
         public int GetFirstDocNumberByDate(string date)
         {
-            return GetFirstDocNumberByDate(date, date);
+            return GetFirstDocNumberByDate(date+" 00:00:00", date+" 23:59:59");
         }
 
         /// <summary>
@@ -305,7 +384,7 @@ namespace Delphin
         /// <returns>Список строк документа. В случаее ошибки вернет NULL.</returns>
         public List<string> GetDocTxtByNum(int num)
         {
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
+            if (client.Connected == false) return null; // состояние соединенияя
 
             List<string> ekl = new List<string>();
             if(SetDocForRead(num))
@@ -328,21 +407,23 @@ namespace Delphin
         /// <param name="docNumber"></param>
         /// <returns>Chech - объект чека, или null</returns>
         public Check GetCheckByNum(int docNumber)
-        {
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null;
+        {// 125 | 1 | docNum
+            if (client.Connected == false) return null; // состояние соединенияя
+
+            //if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
 
             if (SetDocForRead(docNumber))
             {
                 List<string> lStr = Separating();
                 var dt = DateTime.Parse(lStr[1].Remove(16));
                 int zNum = Int32.Parse(lStr[3]); // Номер Z-отчета
-                byte[] sendBytes = { 125, 50, 09 };
+                byte[] sendBytes = { 05, 17, 00, 1, 00, 49, 50, 53, 09, 50, 09 };
                 sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
                 sendBytes = sendBytes.Concat(SEP).ToArray();
                 Check c = null;
                 while (Send(sendBytes))
                 {
-                    string s = ASCIIEncoding.ASCII.GetString(answer, 7, answerlenght - 21);
+                    string s = ASCIIEncoding.ASCII.GetString(answer, 8, answerlenght - 9);
                     byte[] buf = Convert.FromBase64String(s); // расшифровонная строка
                     //Console.WriteLine(BitConverter.ToString(buf)+"\n");
                     
@@ -397,10 +478,8 @@ namespace Delphin
                             else if (buf[6] == 02) // скидка
                             {
                                 double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
-                                double sum = c.goods.Last<Good>().sum;
-                                c.goods.Last<Good>().discSum = ((sum / 100.0) * proc);
 
-                                //double test = Convert.ToDouble(BitConverter.ToUInt64(buf, 24)) / 100;
+                                double test = Convert.ToDouble(BitConverter.ToUInt64(buf, 24)) / 100;
                                 // скидка на последний товар, на текущий момент.
                                 c.goods.Last<Good>().discSurc = -proc;
 
@@ -489,10 +568,11 @@ namespace Delphin
         /// <returns>string - одна строка из документа</returns>
         public string ReadDocStr(int docNumber)
         {// 125 | 1 | docNum
+            if (client.Connected == false) return null; // состояние соединенияя
 
             if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
 
-            byte[] sendBytes = { 125, 49, 09 };
+            byte[] sendBytes = { 05, 17, 00, 1, 00, 49, 50, 53, 09, 49, 09 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             if (Send(sendBytes))
