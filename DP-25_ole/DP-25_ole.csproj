@@ -52,8 +52,10 @@
   <ItemGroup>
     <Compile Include="ECRetherPrivat.cs" />
     <Compile Include="ECRether.cs" />
+    <Compile Include="ECR.cs" />
     <Compile Include="ECRrs232.cs" />
     <Compile Include="ECRfor1C.cs" />
+    <Compile Include="ECRPrivat.cs" />
     <Compile Include="ECRrs232Privat.cs" />
     <Compile Include="IECR.cs" />
     <Compile Include="IEvents.cs" />

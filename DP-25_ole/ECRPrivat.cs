@@ -9,11 +9,16 @@ using System.Threading;
 namespace Delphin
 {
     
-    public partial class ECRrs232 : ECR, IECR
+    public partial class ECR : IECR
     {
         #region Private Field
 
+        public bool isRS232Connectiom;
+
         internal SerialPort sP;
+
+        internal TcpClient client = null;
+        private NetworkStream tcpStream = null;
 
         internal bool isAnfer = false; // есть ответ
         internal byte cNum = 32; // порядковый номер соосбщения
@@ -27,12 +32,24 @@ namespace Delphin
 
         #endregion Private Field
 
+        private bool Send(byte[] Send)
+        {
+            if (isRS232Connectiom)
+            {
+                return SendToRS(Send);
+            }
+            else
+            {
+                return SendToTCP(Send);
+            }
+        }
+
         /// <summary>
         /// Метод отправляет массив байт и обрабатывает ответ.
         /// </summary>
         /// <param name="sendBytes"> Массив байт для отправки.</param>
         /// <returns></returns>
-        private bool Send(byte[] Send)
+        private bool SendToRS(byte[] Send)
         {
             byte len = Convert.ToByte(Send.Length + 35);
             cNum++;
@@ -84,6 +101,49 @@ namespace Delphin
                // Console.WriteLine("ERROR -" + ASCIIEncoding.ASCII.GetString(answer));
             }
             return false;
+        }
+
+        /// <summary>
+        /// Метод отправляет массив байт и обрабатывает ответ.
+        /// </summary>
+        /// <param name="sendBytes"> Массив байт для отправки.</param>
+        /// <returns></returns>
+        private bool SendToTCP(byte[] sendBytes)
+        {
+            if (client.Connected)
+            {
+                byte[] leng = { Convert.ToByte(sendBytes.Length) };
+                sendBytes = leng.Concat(sendBytes).ToArray();
+                tcpStream.Write(sendBytes, 0, sendBytes.Length);
+                byte[] bytes = new byte[client.ReceiveBufferSize];
+                int bytesRead = tcpStream.Read(bytes, 0, client.ReceiveBufferSize);
+                if (bytesRead > 0)
+                {
+                    if (bytes[6] == 80)
+                    {
+                        // answer = BitConverter.ToString(bytes, 0, bytesRead);
+                        answer = bytes;
+                        answerlenght = bytesRead;
+                        return true;
+                    }
+                    else if (bytes[6] == 70)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -157,7 +217,15 @@ namespace Delphin
         /// <returns>bool</returns>
         private bool SetDocForRead(int docNumber)
         {// 125 | 1 | docNum
-            byte[] sendBytes = { 125, 48, 09 };
+            byte[] sendBytes;
+            if (isRS232Connectiom)
+            {
+                sendBytes = new byte[] { 125, 48, 09 };
+            }
+            else
+            {
+                sendBytes = new byte[] { 05, 17, 00, 1, 00, 49, 50, 53, 09, 48, 09 };
+            }
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             if (Send(sendBytes))
@@ -174,7 +242,16 @@ namespace Delphin
         /// <returns>DateTime - Дата документа.</returns>
         public DateTime GetDateDocByDocNum(int docNumber)
         {
-            byte[] sendBytes = { 125, 48, 09 };
+            byte[] sendBytes;
+            if (isRS232Connectiom)
+            {
+                sendBytes = new byte[] { 125, 48, 09 };
+            }
+            else
+            {
+                sendBytes = new byte[] { 05, 17, 00, 1, 00, 49, 50, 53, 09, 48, 09 };
+            }
+
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             if (Send(sendBytes))

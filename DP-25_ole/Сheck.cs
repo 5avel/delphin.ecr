@@ -53,7 +53,24 @@ namespace Delphin
         public bool isVoidCheck { get; set; }
         public Collection<Good> goods { get; set; }
         public Collection<Payment> payments { get; set; }
-        public double discSurc { get; set; }
+        private double DiscSurc;
+
+        public double discSurc
+        {
+          get { return DiscSurc; }
+          set 
+          { 
+              DiscSurc = value; 
+              foreach(var g in this.goods)
+              {
+                  g.discSurc = DiscSurc;
+                  g.discSum = ((g.sum / 100.0) * -DiscSurc);
+              }
+
+          }
+        }
+
+        
         public double CheckSum { get; set; }
         public double CheckTax1Sam { get; set; }
         public double CheckTax1ZbirSam { get; set; }

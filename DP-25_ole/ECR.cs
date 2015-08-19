@@ -2,30 +2,34 @@
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
 namespace Delphin
 {
-    [Guid("a0cc9128-46fc-4bf7-a2b8-76d1e81ae686"), ClassInterface(ClassInterfaceType.None), ComSourceInterfaces(typeof(IEvents))]
-    public partial class ECRrs232 : ECR, IECR
+    [Guid("a0cc9128-46fc-4bf7-a2b8-76d1e81ae681"), ClassInterface(ClassInterfaceType.None), ComSourceInterfaces(typeof(IEvents))]
+    public partial class ECR : IECR
     {
-        public ECRrs232()
-        {
-            Timeout = 500;     
-        }
-
-        public ECRrs232(int timeout)
-        {
-            Timeout = timeout;
-        }
 
         public int Timeout { set; get; }
 
 #region Public methods
 
-        public bool Connect(string port, int speed = 115200, int logNum = 1)
+        public bool Connect(string portOrIP, int speedOrPort)
+        {
+            if (isRS232Connectiom)
+            {
+                return ConnectToRS(portOrIP, speedOrPort);
+            }
+            else
+            {
+                return ConnectToTCP(portOrIP, speedOrPort);
+            }
+        }
+
+        public bool ConnectToRS(string port, int speed = 115200)
         {
             try
             {
@@ -54,23 +58,134 @@ namespace Delphin
             }
         }
 
+        public bool ConnectToTCP(string ip, int port)
+        {
+            try
+            {
+                client = new TcpClient();
+                client.Connect(ip, port); // Соединяемся с сервером
+                if (client.Connected)
+                {
+                    tcpStream = client.GetStream();
+                    byte[] sendBytes = { 5, 5, 1, 0, 1, 0 }; // Open SET
+                    tcpStream.Write(sendBytes, 0, sendBytes.Length);
+
+                    byte[] bytes = new byte[client.ReceiveBufferSize];
+                    int bytesRead = tcpStream.Read(bytes, 0, client.ReceiveBufferSize);
+                    if (bytesRead > 0)
+                    {
+                        if (bytes[5] == 00)
+                        {
+                            if (DateTime.MinValue == GetDateDocByDocNum(1))
+                            {
+                                Disconnect();
+                                return false;
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                        }
+                        else if (bytes[5] == 02)
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (SocketException ex)
+            {
+                Console.WriteLine("Exception: " + ex.ToString());
+                return false;
+            }
+        }
+
         public bool Disconnect()
         {
-            if (sP.IsOpen == true)
-                sP.Close();
-
-            if (sP.IsOpen == false)
+            if (isRS232Connectiom)
             {
-                return true;
+                if (sP.IsOpen == true) sP.Close();
+
+                if (sP.IsOpen == false)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                try
+                {
+                    if (client.Connected)
+                    {
+                        tcpStream = client.GetStream();
+                        byte[] sendBytes = { 5, 5, 2, 0, 1, 0 }; // Close SET
+                        tcpStream.Write(sendBytes, 0, sendBytes.Length);
+
+                        byte[] bytes = new byte[client.ReceiveBufferSize];
+                        int bytesRead = tcpStream.Read(bytes, 0, client.ReceiveBufferSize);
+                        if (bytesRead > 0)
+                        {
+                            if (bytes[5] == 00)
+                            {
+                                return true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                catch (SocketException ex)
+                {
+                    Console.WriteLine("Exception: " + ex.ToString());
+                    return false;
+                }
+                finally
+                {
+                    client.Close();
+                }
             }
             return false;
         }
+
+
 
         public bool Beep(int tone, int len)
         {
             if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
 
-            byte[] sendBytes = { 80 };
+            byte[] sendBytes;
+            if (isRS232Connectiom)
+            {
+                sendBytes = new byte[] { 80 };
+            }
+            else
+            {
+                sendBytes = new byte[] { 05, 17, 00, 1, 00, 56, 48, 09 };
+            }
+
+
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(tone.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(len.ToString())).ToArray();
@@ -92,7 +207,7 @@ namespace Delphin
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(pluCode.ToString())).ToArray(); // 31h
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
     
-            if (Send(sendBytes))
+            if (SendToRS(sendBytes))
             {
                 PLU plu = new PLU();
                 List<string> lPlu = Separating();
@@ -125,7 +240,7 @@ namespace Delphin
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(lastPlu.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
-            if (Send(sendBytes))
+            if (SendToRS(sendBytes))
             {
                 return true;
             }
@@ -177,7 +292,7 @@ namespace Delphin
                 sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(connectedPLU.ToString())).ToArray();
             }
             sendBytes = sendBytes.Concat(SEP).ToArray(); 
-            if (Send(sendBytes))
+            if (SendToRS(sendBytes))
             {
                 return true;
             }
@@ -213,7 +328,7 @@ namespace Delphin
 
             byte[] sendBytes = {62};
 
-            if (Send(sendBytes))
+            if (SendToRS(sendBytes))
             {
                 return Encoding.Default.GetString(answer, 7, 17);
             }
@@ -235,7 +350,7 @@ namespace Delphin
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dataTime)).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
 
-            if (Send(sendBytes))
+            if (SendToRS(sendBytes))
             {
                 return true;
             }
@@ -252,7 +367,7 @@ namespace Delphin
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dateOut)).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
-            if (Send(sendBytes))
+            if (SendToRS(sendBytes))
             {
                 //Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
                 //  Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
@@ -271,7 +386,7 @@ namespace Delphin
 
             byte[] sendBytes = { 124, 09, 09 };
 
-            if (Send(sendBytes))
+            if (SendToRS(sendBytes))
             {
                 //Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
                 //  Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
@@ -351,7 +466,7 @@ namespace Delphin
                 sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
                 sendBytes = sendBytes.Concat(SEP).ToArray();
                 Check c = null;
-                while (Send(sendBytes))
+                while (SendToRS(sendBytes))
                 {
                     string s = ASCIIEncoding.ASCII.GetString(answer, 7, answerlenght - 21);
                     byte[] buf = Convert.FromBase64String(s); // расшифровонная строка
@@ -510,7 +625,7 @@ namespace Delphin
             byte[] sendBytes = { 125, 49, 09 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
-            if (Send(sendBytes))
+            if (SendToRS(sendBytes))
             {
                 return Encoding.Default.GetString(answer, 7, answerlenght - 8);
             }

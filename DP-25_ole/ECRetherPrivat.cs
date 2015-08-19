@@ -7,14 +7,13 @@ using System.Text;
 
 namespace Delphin
 {
-    public partial class ECRether : IECR
+    public partial class ECRether : ECR, IECR
     {
         #region Private Field
 
 
         internal TcpClient client = null;
         private NetworkStream tcpStream = null;
-        private int logNum = 0;
         private byte[] SEP = { 9 };
         private byte[] answer = new byte[256];
         private int answerlenght = 0;

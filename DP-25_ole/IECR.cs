@@ -10,7 +10,8 @@ namespace Delphin
         [DispId(1)]
 
         // описываем методы которые можно будет вызывать из вне
-        bool Connect(string port, int speed, int logNum);
+       // bool Connect(string port, int speed, int logNum);
+       // bool Connect(string port, int speed);
         bool Disconnect();
         bool Beep(int tone, int len);
         PLU ReadPlu(int pluCode);
