@@ -193,9 +193,13 @@ namespace Delphin
         {
             List<string> lStr = new List<string>();
             String temp = String.Empty;
-            
 
-            for (int i = 7; i < answerlenght; i++) // перебор массива ответа
+            int beginAnsfer;
+            if (isRS232Connectiom) beginAnsfer = 7; // для RS232
+            else beginAnsfer = 8; // для TCP
+
+
+            for (int i = beginAnsfer; i < answerlenght; i++) // перебор массива ответа
             {
                 if (answer[i] != 09) // не встретили сепаратор
                 {

@@ -176,16 +176,9 @@ namespace Delphin
             if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
 
             byte[] sendBytes;
-            if (isRS232Connectiom)
-            {
-                sendBytes = new byte[] { 80 };
-            }
-            else
-            {
-                sendBytes = new byte[] { 05, 17, 00, 1, 00, 56, 48, 09 };
-            }
-
-
+            if (isRS232Connectiom) sendBytes = new byte[] { 80 };        
+            else sendBytes = new byte[] { 05, 17, 00, 1, 00, 56, 48, 09 };
+            
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(tone.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(len.ToString())).ToArray();
@@ -203,11 +196,14 @@ namespace Delphin
         {
             if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
 
-            byte[] sendBytes = { 107, 82, 09 };
+            byte[] sendBytes;
+            if (isRS232Connectiom) sendBytes = new byte[] { 107, 82, 09 };
+            else sendBytes = new byte[] { 05, 17, 00, 1, 00, 49, 48, 55, 09, 82, 09 };
+
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(pluCode.ToString())).ToArray(); // 31h
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
     
-            if (SendToRS(sendBytes))
+            if (Send(sendBytes))
             {
                 PLU plu = new PLU();
                 List<string> lPlu = Separating();
@@ -235,12 +231,15 @@ namespace Delphin
         {
             if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
 
-            byte[] sendBytes = { 107, 104, 09 };
+            byte[] sendBytes;
+            if (isRS232Connectiom) sendBytes = new byte[] { 107, 104, 09 };
+            else sendBytes = new byte[] { 05, 17, 00, 1, 00, 49, 48, 55, 09, 68, 09 };
+
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(firstPlu.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(lastPlu.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
-            if (SendToRS(sendBytes))
+            if (Send(sendBytes))
             {
                 return true;
             }
@@ -257,7 +256,10 @@ namespace Delphin
         {
             //if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
 
-            byte[] sendBytes = { 107, 80, 09 };
+            byte[] sendBytes;
+            if (isRS232Connectiom) sendBytes = new byte[] { 107, 80, 09 };
+            else sendBytes = new byte[] { 05, 17, 00, 1, 00, 49, 48, 55, 09, 80, 09 };
+
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(plu.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(taxGr.ToString())).ToArray();
@@ -292,7 +294,7 @@ namespace Delphin
                 sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(connectedPLU.ToString())).ToArray();
             }
             sendBytes = sendBytes.Concat(SEP).ToArray(); 
-            if (SendToRS(sendBytes))
+            if (Send(sendBytes))
             {
                 return true;
             }
@@ -326,7 +328,9 @@ namespace Delphin
         {
             if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
 
-            byte[] sendBytes = {62};
+            byte[] sendBytes;
+            if (isRS232Connectiom) sendBytes = new byte[] { 62 };
+            else sendBytes = new byte[] { 05, 17, 00, 1, 00, 54, 50, 09 };
 
             if (SendToRS(sendBytes))
             {
@@ -346,11 +350,14 @@ namespace Delphin
         {
             if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
 
-            byte[] sendBytes = { 61 };
+            byte[] sendBytes;
+            if (isRS232Connectiom) sendBytes = new byte[] { 61 };
+            else sendBytes = new byte[] { 05, 17, 00, 1, 00, 54, 49, 09 };
+
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dataTime)).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
 
-            if (SendToRS(sendBytes))
+            if (Send(sendBytes))
             {
                 return true;
             }
@@ -362,12 +369,15 @@ namespace Delphin
         {
             if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
 
-            byte[] sendBytes = {124};
+            byte[] sendBytes;
+            if (isRS232Connectiom) sendBytes = new byte[] { 124 };
+            else sendBytes = new byte[] { 05, 17, 00, 1, 00, 49, 50, 52, 09, };
+
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dateIn)).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dateOut)).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
-            if (SendToRS(sendBytes))
+            if (Send(sendBytes))
             {
                 //Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
                 //  Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
@@ -382,11 +392,12 @@ namespace Delphin
 
         public int GetLastDocNumber()
         {
+            byte[] sendBytes;
+            if (isRS232Connectiom) sendBytes = new byte[] { 124, 09, 09 };
+            else sendBytes = new byte[] { 05, 17, 00, 1, 00, 49, 50, 52, 09, 09, 09 };
 
 
-            byte[] sendBytes = { 124, 09, 09 };
-
-            if (SendToRS(sendBytes))
+            if (Send(sendBytes))
             {
                 //Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
                 //  Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
@@ -462,13 +473,23 @@ namespace Delphin
                 List<string> lStr = Separating();
                 var dt = DateTime.Parse(lStr[1].Remove(16));
                 int zNum = Int32.Parse(lStr[3]); // Номер Z-отчета
-                byte[] sendBytes = { 125, 50, 09 };
+
+                byte[] sendBytes;
+                if (isRS232Connectiom) sendBytes = new byte[] { 125, 50, 09 };
+                else sendBytes = new byte[] { 05, 17, 00, 1, 00, 49, 50, 53, 09, 50, 09 };
+
                 sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
                 sendBytes = sendBytes.Concat(SEP).ToArray();
                 Check c = null;
-                while (SendToRS(sendBytes))
-                {
-                    string s = ASCIIEncoding.ASCII.GetString(answer, 7, answerlenght - 21);
+
+                int beginAnsfer;
+                int endAnsfer;
+                if (isRS232Connectiom) { beginAnsfer = 7; endAnsfer = 21; } // для RS232
+                else { beginAnsfer = 8; endAnsfer = 9; } // для TCP
+
+                while (Send(sendBytes))
+                {                                                   // 8    -9
+                    string s = ASCIIEncoding.ASCII.GetString(answer, beginAnsfer, answerlenght - endAnsfer);
                     byte[] buf = Convert.FromBase64String(s); // расшифровонная строка
                     //Console.WriteLine(BitConverter.ToString(buf)+"\n");
                     
@@ -622,10 +643,13 @@ namespace Delphin
 
             if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
 
-            byte[] sendBytes = { 125, 49, 09 };
+            byte[] sendBytes;
+            if (isRS232Connectiom) sendBytes = new byte[] { 125, 49, 09 };
+            else sendBytes = new byte[] { 05, 17, 00, 1, 00, 49, 50, 53, 09, 49, 09 };
+
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
-            if (SendToRS(sendBytes))
+            if (Send(sendBytes))
             {
                 return Encoding.Default.GetString(answer, 7, answerlenght - 8);
             }
