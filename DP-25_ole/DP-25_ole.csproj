@@ -60,7 +60,6 @@
     <Compile Include="Сheck.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram2.cd" />
     <None Include="DP-25 COM .docx" />
     <None Include="key.snk" />
   </ItemGroup>
