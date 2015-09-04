@@ -8,17 +8,28 @@ namespace Delphin
 
 
         private ECR ecr;
-
-        public bool Connect(string port, int speed = 115200, bool isRS232 = true, int timeout = 500)
+        /// <summary>
+        /// Функция предназначена для установки соединения с ККМ.
+        /// </summary>
+        /// <param name="ipOrCom">IP адрес аппарата(DNS имя) или номер СОМ порта, в зависиммости от параметра isRS232.</param>
+        /// <param name="portOrSpeed">ТСР порт или сеорость СОМ порта, в зависиммости от параметра isRS232.</param>
+        /// <param name="isRS232">true - Подключение по СОМ порту, false - подключение по TCP.</param>
+        /// <param name="timeout"> Таймаут подключение по СОМ порту. (в милмсекундай, по умолчанию 500мс).</param>
+        /// <returns>True - при успешном соединении, False - в случае ошибки.</returns>
+        public bool Connect(string ipOrCom, int portOrSpeed = 115200, bool isRS232 = true, int timeout = 500)
         {
             
             ecr = new ECR();
             ecr.Timeout = timeout;
             ecr.isRS232Connectiom = isRS232;
 
-            return ecr.Connect(port, speed);
+            return ecr.Connect(ipOrCom, portOrSpeed);
         }
 
+        /// <summary>
+        /// Функция предназначена для закрытия соединения с ККМ.
+        /// </summary>
+        /// <returns>Возвращаемое значение: логического типа, ИСТИНА, если функция выполнена успешно, ЛОЖЬ – если возникла ошибка. </returns>
         public bool Disconnect()
         {
             return ecr.Disconnect();
@@ -115,12 +126,15 @@ namespace Delphin
         ///  оборот при снятии Z – отчета.
         /// </summary>
         /// <param name="Row"> целое число, номер ряда таблицы артикулов,  из которого будет удален товар.</param>
-        /// <returns>Возвращаемое значение: логического типа, ИСТИНА, если функция выполнена успешно, ЛОЖЬ – если возникла ошибка. 
-        /// Возвращаемое значение можно также прочитать функцией GetLastError, которая возвращает результат
-        /// выполнения последней функции (0-успешно, 1-ошибка).</returns>
+        /// <returns>Возвращаемое значение: логического типа, ИСТИНА, если функция выполнена успешно, ЛОЖЬ – если возникла ошибка. </returns>
         public bool ClearArticul(int Row)
         {
             return ecr.DeletingPlu(Row);
+        }
+
+        public bool ClearAllArticul()
+        {
+            return ecr.DeletingAllPlu();
         }
 
         public double OperName { private set; get; }

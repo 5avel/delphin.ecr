@@ -227,12 +227,25 @@ namespace Delphin
             return null;
         }
 
+        public bool DeletingAllPlu()
+        {
+            byte[] sendBytes;
+            if (isRS232Connectiom) sendBytes = new byte[] { 107, 68, 09, 65, 09, 09 };
+            else sendBytes = new byte[] { 05, 17, 00, 1, 00, 49, 48, 55, 09, 68, 09, 65, 09, 09 };
+
+            if (Send(sendBytes))
+            {
+                return true;
+            }
+            return false;
+        }
+
         public bool DeletingPlu(int firstPlu, int lastPlu)
         {
             if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
 
             byte[] sendBytes;
-            if (isRS232Connectiom) sendBytes = new byte[] { 107, 104, 09 };
+            if (isRS232Connectiom) sendBytes = new byte[] { 107, 68, 09 };
             else sendBytes = new byte[] { 05, 17, 00, 1, 00, 49, 48, 55, 09, 68, 09 };
 
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(firstPlu.ToString())).ToArray();

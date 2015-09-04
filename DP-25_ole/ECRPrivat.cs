@@ -97,8 +97,8 @@ namespace Delphin
             }
             else
             {
-              //  Console.WriteLine("ERROR -" + BitConverter.ToString(answer));
-               // Console.WriteLine("ERROR -" + ASCIIEncoding.ASCII.GetString(answer));
+                Console.WriteLine("ERROR -" + BitConverter.ToString(answer));
+                Console.WriteLine("ERROR -" + ASCIIEncoding.ASCII.GetString(answer));
             }
             return false;
         }
