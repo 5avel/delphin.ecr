@@ -21,6 +21,7 @@ namespace Delphin
         private NetworkStream tcpStream = null;
 
         internal bool isAnfer = false; // есть ответ
+        internal bool isLongOperation = false; // Длительная операция
         internal byte cNum = 32; // порядковый номер соосбщения
 
 
@@ -158,7 +159,20 @@ namespace Delphin
             answerlenght = sp.BytesToRead;
             answer = new byte[answerlenght];
             sp.Read(answer, 0, answerlenght);
-            isAnfer = true;
+
+            Console.WriteLine("INFO -" + BitConverter.ToString(answer));
+            Console.WriteLine("INFO -" + ASCIIEncoding.ASCII.GetString(answer));
+           
+            if (answerlenght < 5 && answer[0] == 22) // длительная операция
+            {
+                isLongOperation = true;
+                Console.WriteLine("isLongOperation");
+            }
+            else
+            {
+                isLongOperation = false;
+                isAnfer = true;
+            }
         }
 
         private bool WaitingAnswer()
@@ -166,11 +180,13 @@ namespace Delphin
             long t = Environment.TickCount;
             while (!isAnfer) // цикл ожидания ответа с СОМ порта
             {
-
-                if ((Environment.TickCount - t) > Timeout)
+                if (!isLongOperation)
                 {
-                    Console.WriteLine("Таймаут " + Timeout.ToString());
-                    break;
+                    if ((Environment.TickCount - t) > Timeout)
+                    {
+                        Console.WriteLine("Таймаут " + Timeout.ToString());
+                        break;
+                    }
                 }
             }
 

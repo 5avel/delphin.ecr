@@ -12,7 +12,7 @@ namespace ConsoleApplication1
             ECRfor1C ecr1c = new ECRfor1C();
 
 
-
+            
             Console.WriteLine(ecr1c.Connect("3", 115200));
 
             Console.WriteLine(ecr1c.Beep(1000, 1000));
@@ -56,9 +56,10 @@ namespace ConsoleApplication1
             //}
 
 
-            Console.WriteLine(ecr1c.Disconnect());
+           // Console.WriteLine(ecr1c.Disconnect());
 
             Console.ReadKey();
+            Console.WriteLine(ecr1c.Disconnect());
             
         } // Main
     } 
