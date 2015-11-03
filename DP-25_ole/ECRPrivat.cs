@@ -131,11 +131,14 @@ namespace Delphin
                // s += i.ToString();
                 j *= 10;
                 j += 81;
-                j += 4601;
+                j += 1391;
+                int j2 = j + 3210;
                 s += j.ToString();
-                if (s != lStr[10]) return DateTime.MinValue;
+                string s2 = j2.ToString();
 
-                return dt;
+                if (s == lStr[10]) return dt;
+                else if (s2 == lStr[10]) return dt;
+   
             }
             return DateTime.MinValue;
         }
