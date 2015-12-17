@@ -60,6 +60,7 @@
     <Compile Include="Сheck.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="1С8.3\DP-25Offline_v1.001.epf" />
     <None Include="ClassDiagram2.cd" />
     <None Include="DP-25 COM .docx" />
     <None Include="key.snk" />
