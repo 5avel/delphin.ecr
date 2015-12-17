@@ -30,8 +30,8 @@ Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 Name: "ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
 
 [Files]
-Source: "C:\GIT\delphin.ecr\DP-25_ole\bin\Debug\DP-25_tcp_com.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\GIT\delphin.ecr\DP-25_ole\bin\Debug\DP-25_tcp_com.tlb"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\San7A\Source\Repos\delphin.ecr\DP-25_ole\bin\Release\DP-25_tcp_com.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\San7A\Source\Repos\delphin.ecr\DP-25_ole\bin\Release\DP-25_tcp_com.tlb"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

@@ -339,8 +339,8 @@ namespace Delphin
             sendBytes = sendBytes.Concat(SEP).ToArray();
             if (Send(sendBytes))
             {
-                //Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
-                //  Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
+                Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
+                  Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
                 List<string> lAnswer = Separating();
                 if (lAnswer.Count == 4)
                 {
@@ -358,7 +358,7 @@ namespace Delphin
         /// <returns></returns>
         public int GetFirstDocNumberByDate(string dateIn, string dateOut)
         {
-            List<string> lS = SearchReceipt(dateIn + " 00:00:00 DST", dateOut+" 23:59:59 DST");
+            List<string> lS = SearchReceipt(dateIn + " 00:00:00", dateOut+" 23:59:59");
 
             if (lS != null)
             {

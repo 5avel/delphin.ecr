@@ -47,6 +47,8 @@ namespace Delphin
                     }
                     else if (bytes[6] == 70)
                     {
+                        Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
+                        Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
                         return false;
                     }
                     else
@@ -133,11 +135,17 @@ namespace Delphin
                 j += 81;
                 j += 1391;
                 int j2 = j + 3210;
+                string s2 = s;
                 s += j.ToString();
-                string s2 = j2.ToString();
+                s2 += j2.ToString();
 
-                if (s == lStr[10]) return dt;
-                else if (s2 == lStr[10]) return dt;
+                
+
+                if ("КР00006552" == lStr[10]    // винил
+                    || "КР00006557" == lStr[10] // винил
+                    || "КР00006512" == lStr[10] // тест
+                    || "КР00005082" == lStr[10] // Кобец Херсон
+                    )  return dt;
    
             }
             return DateTime.MinValue;
