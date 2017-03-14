@@ -74,16 +74,16 @@ namespace ConsoleApplication1
 
 
 
-            Console.WriteLine(ecr1c.Connect("192.168.88.52", 5999, 1));
+            Console.WriteLine(ecr1c.Connect("192.168.0.100", 5999, 1));
            // Console.WriteLine(ecr1c.GetDataTime());
             ecr1c.Beep(1555, 500);
 
-            ecr1c.DataSalesFrom = "01-12-15";
-            ecr1c.DataSalesTo = "15-12-15";
-            while (ecr1c.GetCheck())
-            { 
+            //ecr1c.DataSalesFrom = "01-12-15";
+            //ecr1c.DataSalesTo = "15-12-15";
+            //while (ecr1c.GetCheck())
+            //{ 
             
-            }
+            //}
             //List<string> list = ecr1c.SearchReceipt("25-07-15 00:00:00 DST", "25-07-15 23:00:00 DST");
 
             //Console.WriteLine(list[0]);          
