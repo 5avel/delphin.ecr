@@ -15,6 +15,7 @@ namespace Delphin
 
         public bool Connect(string ip, int port, byte logNum)
         {
+            Console.WriteLine("ip - {0}, port - {1} lognum - {2}",ip,port,logNum);
             if(logNum>0|| logNum<100)
             {
                 this.logNum = logNum;
