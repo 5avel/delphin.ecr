@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\ConsoleApplication1",
+    "\\DP-25_ole"
   ],
-  "SelectedNode": "\\ConsoleApplication1.sln",
+  "SelectedNode": "\\ConsoleApplication1\\Program.cs",
   "PreviewInSolutionExplorer": false
 }
