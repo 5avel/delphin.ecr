@@ -3,109 +3,67 @@ namespace Delphin
 {
     public class PLU
     {
-        private int code;
-        public int Code
-        {
-            get { return code; }
-            internal set { code = value; }
-        }
+        /// <summary>
+        /// Item number ( For ECRs 1...100000; For FPs 1...3000 );
+        /// </summary>
+        public int Code { get; internal set; }
 
-        private byte taxGr;
-        public byte TaxGr
-        {
-            get { return taxGr; }
-            internal set { taxGr = value; }
-        }
+        /// <summary>
+        /// VAT group (letter 'A'...'H' or cyrillic 'А'...'З');
+        /// </summary>
+        public byte TaxGr  { get; internal set; }
 
-        private byte dep;
-        public byte Dep
-        {
-            get { return dep; }
-            internal set { dep = value; }
-        }
+        /// <summary>
+        /// Department ( 0...99 );
+        /// </summary>
+        public byte Dep { get; internal set; }
 
-        private byte group;
-        public byte Group
-        {
-            get { return group; }
-            internal set { group = value; }
-        }
+        /// <summary>
+        /// Stock group (1...99);
+        /// </summary>
+        public byte Group  { get; internal set; }
 
-        private byte priceType;
-        public byte PriceType
-        {
-            get { return priceType; }
-            internal set { priceType = value; }
-        }
+        /// <summary>
+        /// Price type ('0' - fixed price, '1' - free price, '2' - max price;) ;
+        /// </summary>
+        public byte PriceType { get; internal set; }
 
-        private double price;
-        public double Price
-        {
-            get { return price; }
-            internal set { price = value; }
-        }
+        /// <summary>
+        /// Price ( 0.00...9999999.99 or 0...999999999 depending dec point position );
+        /// </summary>
+        public double Price { get; internal set; }
 
-        private double turnover;
-        public double Turnover
-        {
-            get { return turnover; }
-            internal set { turnover = value; }
-        }
+        /// <summary>
+        /// Accumulated amount of the item ( 0.00...9999999.99 or 0...999999999 depending dec point position );
+        /// </summary>
+        public double Turnover { get;  internal set; }
 
-        private double soldQty;
-        public double SoldQty
-        {
-            get { return soldQty; }
-            internal set { soldQty = value; }
-        }
+        /// <summary>
+        /// Sold out quantity ( 0.001...99999.999 );
+        /// </summary>
+        public double SoldQty { get; internal set; }
 
-        private double stockQty;
-        public double StockQty
-        {
-            get { return stockQty; }
-            internal set { stockQty = value; }
-        }
+        /// <summary>
+        /// Current quantity ( 0.001...99999.999 );
+        /// </summary>
+        public double StockQty { get; internal set; }
 
-        private string bar1;
-        public string Bar1
-        {
-            get { return bar1; }
-            internal set { bar1 = value; }
-        }
+        /// <summary>
+        ///  Item name ( up to 72 symbols );
+        /// </summary>
+        public string Name{ get; internal set; }
 
-        private string bar2;
-        public string Bar2
-        {
-            get { return bar2; }
-            internal set { bar2 = value; }
-        }
-
-        private string bar3;
-        public string Bar3
-        {
-            get { return bar3; }
-            internal set { bar3 = value; }
-        }
-
-        private string bar4;
-        public string Bar4
-        {
-            get { return bar4; }
-            internal set { bar4 = value; }
-        }
-
-        private string name;
-        public string Name
-        {
-            get { return name; }
-            internal set { name = value; }
-        }
-
-        private int connectedPLU;
-        public int ConnectedPLU
-        {
-            get { return connectedPLU; }
-            internal set { connectedPLU = value; }
-        } 
+        /// <summary>
+        /// Barcode X ( up to 13 digits );
+        /// </summary>
+        public string BarX { get; internal set; }
+        /// <summary>
+        /// Дробное количество 1 true, 0 false
+        /// </summary>
+        public string FractionalQty { get; internal set; }
+        /// <summary>
+        /// Код УКТЗЕД (up to 10 digits)
+        /// </summary>
+        public string CustomCode { get; internal set; }
     }
 }

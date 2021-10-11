@@ -8,70 +8,36 @@ using System.Text;
 namespace Delphin
 {
     [Guid("a0cc9128-46fc-4bf7-a2b8-76d1e81ae686"), ClassInterface(ClassInterfaceType.None), ComSourceInterfaces(typeof(IEvents))]
-    public partial class ECR : IECR
+    public class ECR : IECR
     {
 
 #region Public methods
 
-        public bool Connect(string ip, int port, byte logNum)
+        public bool Connect(string ip, int port)
         {
-            Console.WriteLine("ip - {0}, port - {1} lognum - {2}",ip,port,logNum);
-            if(logNum>0|| logNum<100)
-            {
-                this.logNum = logNum;
-            }
-            else
-            {
-                return false;
-            }
             try
             {
                 client = new TcpClient();
                 client.Connect(ip, port); // Соединяемся с сервером
-                if (client.Connected)
-                {
-                    tcpStream = client.GetStream();
-                    byte[] sendBytes = { 5, 5, 1, 0, logNum, 0 }; // Open SET
-                    tcpStream.Write(sendBytes, 0, sendBytes.Length);
+                if (!client.Connected) return false;
+                tcpStream = client.GetStream();
+                byte[] sendBytes = { 5, 5, 1, 0, 1, 0 }; // Open SET
+                tcpStream.Write(sendBytes, 0, sendBytes.Length);
+                byte[] bytes = new byte[client.ReceiveBufferSize];
+                int bytesCount = tcpStream.Read(bytes, 0, client.ReceiveBufferSize);
 
-                    byte[] bytes = new byte[client.ReceiveBufferSize];
-                    int bytesRead = tcpStream.Read(bytes, 0, client.ReceiveBufferSize);
-                    if (bytesRead > 0)
-                    {
-                        if (bytes[5] == 00)
-                        {
-                            if (DateTime.MinValue == GetDateDocByDocNum(1))
-                            {
-                                Disconnect();
-                                return false;
-                            }
-                            else
-                            {
-                                return true;
-                            }
-                        }
-                        else if (bytes[5] == 02)
-                        {
-                            return false;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                    else 
-                    {
-                        return false;
-                    }
-                }
-                else
+                if (bytesCount == 0 || bytes[5] != 0)
                 {
+                    Disconnect();
                     return false;
                 }
+
+                return true;
             }
             catch(SocketException ex)
             {
-                Console.WriteLine("Exception: " + ex.ToString());
+                Disconnect();
+                Console.WriteLine("Exception from Connect: " + ex.ToString());
                 return false;
             }
         }
@@ -80,34 +46,14 @@ namespace Delphin
         {
             try
             {
-                if (client.Connected)
-                {
-                    tcpStream = client.GetStream();
-                    byte[] sendBytes = { 5, 5, 2, 0, this.logNum, 0 }; // Close SET
-                    tcpStream.Write(sendBytes, 0, sendBytes.Length);
-
-                    byte[] bytes = new byte[client.ReceiveBufferSize];
-                    int bytesRead = tcpStream.Read(bytes, 0, client.ReceiveBufferSize);
-                    if (bytesRead > 0)
-                    {
-                        if (bytes[5] == 00)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    return false;
-                }
+                if (!client.Connected) return false;
+                tcpStream = client.GetStream();
+                byte[] sendBytes = { 5, 5, 2, 0, 1, 0 }; // Close SET
+                tcpStream.Write(sendBytes, 0, sendBytes.Length);
+                byte[] bytes = new byte[client.ReceiveBufferSize];
+                int bytesCount = tcpStream.Read(bytes, 0, client.ReceiveBufferSize);
+                if (bytesCount == 0 || bytes[5] != 0) return false;
+                return true;
             }
             catch (SocketException ex)
             {
@@ -122,9 +68,9 @@ namespace Delphin
 
         public bool Beep(int tone, int len)
         {
-            if (client.Connected == false) return false; // состояние соединенияя
+            if (!client.Connected) return false; // состояние соединенияя
 
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 56, 48, 09 };
+            byte[] sendBytes = { 5, 17, 0, 1, 0, 56, 48, 9 };
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(tone.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(len.ToString())).ToArray();
@@ -132,14 +78,15 @@ namespace Delphin
             return Send(sendBytes);
         }
 
+
+
         public PLU ReadPlu(int pluCode)
         {
             if (client.Connected == false) return null; // состояние соединенияя
 
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
                                                                        // R
                                                        //31h 30h 37h 09h 52h 09h  
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 82, 09 };
+            byte[] sendBytes = { 5, 17, 0, 1, 00, 49, 48, 55, 9, 82, 9 };
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(pluCode.ToString())).ToArray(); // 31h
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
             if(Send(sendBytes) && answerlenght > 8)
@@ -155,12 +102,10 @@ namespace Delphin
                 plu.Turnover = Convert.ToDouble(lPlu[6].Replace(".", ","));
                 plu.SoldQty = Convert.ToDouble(lPlu[7].Replace(".", ","));
                 plu.StockQty = Convert.ToDouble(lPlu[8].Replace(".", ","));
-                plu.Bar1 = lPlu[9];
-                plu.Bar2 = lPlu[10];
-                plu.Bar3 = lPlu[11];
-                plu.Bar4 = lPlu[12];
+                plu.BarX = lPlu[9];
                 plu.Name = lPlu[13];
-                plu.ConnectedPLU = Convert.ToInt32(lPlu[14]);
+                plu.FractionalQty = lPlu[14];
+                plu.CustomCode = lPlu[15];
                return plu;
             }
             return null;
@@ -168,13 +113,11 @@ namespace Delphin
 
         public bool DeletingPlu(int firstPlu, int lastPlu)
         {
-            if (client.Connected == false) return false; // состояние соединенияя
-
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
-
+            if (!client.Connected) return false; // состояние соединенияя
                                                                        // D
                                                        //31h 30h 37h 09h 44h 09h  
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 68, 09 };
+            byte[] sendBytes = { 5, 17, 0, 1, 0, 49, 48, 55, 9, 68, 9 };
+            
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(firstPlu.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray(); // 09h
             sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(lastPlu.ToString())).ToArray();
@@ -192,7 +135,7 @@ namespace Delphin
         }
 
         public bool WritePlu(   int plu, byte taxGr, byte dep, byte group, byte priceType, double price, double addQty,
-                                double quantity, string bar1, string bar2, string bar3, string bar4, string name, int connectedPLU)
+                                double quantity, string barX, string name, int fractionalQty, string customCode)
         {
             if (client.Connected == false) return false; // состояние соединенияя
 
@@ -200,7 +143,7 @@ namespace Delphin
 
                                                                        // P
                                                        //31h 30h 37h 09h 50h 09h  
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 48, 55, 09, 80, 09 };
+            byte[] sendBytes = { 5, 17, 0, 1, 0, 49, 48, 55, 9, 80, 9 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(plu.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(taxGr.ToString())).ToArray();
@@ -220,21 +163,15 @@ namespace Delphin
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(quantity.ToString().Replace(',', '.'))).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
-            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(bar1.ToString())).ToArray();
-            sendBytes = sendBytes.Concat(SEP).ToArray();
-            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(bar2.ToString())).ToArray();
-            sendBytes = sendBytes.Concat(SEP).ToArray();
-            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(bar3.ToString())).ToArray();
-            sendBytes = sendBytes.Concat(SEP).ToArray();
-            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(bar4.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(barX.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray(); 
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(name.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
-            if (addQty < 0)
-            {
-                sendBytes = sendBytes.Concat(Encoding.ASCII.GetBytes(connectedPLU.ToString())).ToArray();
-            }
-            sendBytes = sendBytes.Concat(SEP).ToArray(); 
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(fractionalQty.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(customCode.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+           
             if (Send(sendBytes))
             {
                 return true;
@@ -243,42 +180,13 @@ namespace Delphin
         }
 
 
-        public bool WritePlu(   int plu, double price, string name, byte taxGr = 1,  byte dep = 1,
-                                byte group = 1,  byte priceType = 0, double addQty = 0, double quantity = 0,
-                                string bar1 = "", string bar2 = "", string bar3 = "", string bar4 = "", int connectedPLU = 0)
-        {
-            return WritePlu(plu, taxGr, dep, group, priceType, price, addQty, quantity, bar1, bar2, bar3, bar4, name, connectedPLU);
-        }
-
-        public bool WritePlu(int plu, byte taxGr, double price, double quantity, string bar1, string name, int connectedPLU)
-        {
-            return WritePlu(plu, taxGr, 1, 1, 0, price, 0, quantity, bar1, "", "", "", name, connectedPLU);
-        }
-
-        public bool WritePlu(int plu, byte taxGr, double price, string bar1, string name)
-        {
-            return WritePlu(plu, taxGr, price, 0, bar1, name , 0);
-        }
-
-        public bool WritePlu(int plu, byte taxGr, double price, string name)
-        {
-            return WritePlu(plu, taxGr, price, "", name);
-        }
-
         public string GetDataTime()
         {
-            if (client.Connected == false) return null; // состояние соединенияя
-
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
-
+            if (!client.Connected) return null; // состояние соединенияя
             //31h 30h 37h 09h 44h 09h  
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 54, 50, 09};
-
-            if (Send(sendBytes))
-            {
-                return Encoding.Default.GetString(answer, 7, 30);
-            }
-            return null;
+            byte[] sendBytes = { 5, 17, 0, 1, 0, 54, 50, 9};
+            if (!Send(sendBytes)) return null;
+            return Encoding.Default.GetString(answer, 7, 30);
         }
 
         /// <summary>
@@ -288,20 +196,13 @@ namespace Delphin
         /// <returns></returns>
         public bool SetDataTime(string dataTime)
         {
-            if (client.Connected == false) return false; // состояние соединенияя     
-
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
- 
+            if (client.Connected == false) return false; // состояние соединенияя   
             //31h 30h 37h 09h 44h 09h  
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 54, 49, 09 };
+            byte[] sendBytes = { 5, 17, 0, 1, 0, 54, 49, 9 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dataTime)).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
-
-            if (Send(sendBytes))
-            {
-                return true;
-            }
-            return false;
+            if (!Send(sendBytes)) return false;
+            return true;
         }
 
         /// <summary>
@@ -311,44 +212,25 @@ namespace Delphin
         public int GetLastDocNumber()
         {
             if (client.Connected == false) return 0; // состояние соединенияя
-
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 52, 09, 09, 09};
-
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return 0; // нет лицензии
-
-            if (Send(sendBytes))
-            {
-                //Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
-              //  Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
-                List<string> lAnswer = Separating();
-                if(lAnswer.Count == 4)
-                {
-                    return Convert.ToInt32(lAnswer[3]);
-                }
-                
-                return 0;
-            }
-            return 0;
+            byte[] sendBytes = { 5, 17, 0, 1, 0, 49, 50, 52, 9, 9, 9};
+            if (!Send(sendBytes)) return 0;
+            List<string> lAnswer = Separating();
+            if (lAnswer.Count != 4) return 0;
+            return Convert.ToInt32(lAnswer[3]); 
         }
 
         public List<string> SearchReceipt(string dateIn, string dateOut)
         {
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 52, 09, };
+            byte[] sendBytes = { 5, 17, 0, 1, 0, 49, 50, 52, 9, };  
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dateIn)).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(dateOut)).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
-            if (Send(sendBytes))
-            {
-                Console.WriteLine(BitConverter.ToString(answer, 0, answerlenght));
-                  Console.WriteLine(Encoding.Default.GetString(answer, 7, answerlenght));
-                List<string> lAnswer = Separating();
-                if (lAnswer.Count == 4)
-                {
-                    return lAnswer;
-                }
-            }
-            return null;
+            if (!Send(sendBytes)) return null;
+            List<string> lAnswer = Separating();
+            Console.WriteLine($"lAnswer Count {lAnswer.Count}");
+            if (lAnswer.Count != 4) return null;
+            return lAnswer;
         }
 
         /// <summary>
@@ -360,12 +242,8 @@ namespace Delphin
         public int GetFirstDocNumberByDate(string dateIn, string dateOut)
         {
             List<string> lS = SearchReceipt(dateIn + " 00:00:00", dateOut+" 23:59:59");
-
-            if (lS != null)
-            {
-                return Convert.ToInt32(lS[2]);
-            }
-            return 0;
+            if (lS == null) return 0;
+            return Convert.ToInt32(lS[2]);
         }
 
         /// <summary>
@@ -385,20 +263,17 @@ namespace Delphin
         /// <returns>Список строк документа. В случаее ошибки вернет NULL.</returns>
         public List<string> GetDocTxtByNum(int num)
         {
-            if (client.Connected == false) return null; // состояние соединенияя
-
+            if (!client.Connected) return null; // состояние соединенияя
             List<string> ekl = new List<string>();
-            if(SetDocForRead(num))
-            {
+            if (!SetDocForRead(num)) return null;
+            
                 string s = ReadDocStr(num);
                 while (s != null)
                 {
                     ekl.Add(s);
                     s = ReadDocStr(num);
                 }
-                return ekl;
-            }
-            return null;            
+                return ekl;           
         }
 
 
@@ -409,157 +284,146 @@ namespace Delphin
         /// <returns>Chech - объект чека, или null</returns>
         public Check GetCheckByNum(int docNumber)
         {// 125 | 1 | docNum
-            if (client.Connected == false) return null; // состояние соединенияя
+            if (!client.Connected) return null; // состояние соединенияя
+            if (!SetDocForRead(docNumber)) return null;
 
-            //if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
-
-            if (SetDocForRead(docNumber))
+            List<string> lStr = Separating();
+            var dt = DateTime.Parse(lStr[1].Remove(16));
+            int zNum = Int32.Parse(lStr[3]); // Номер Z-отчета
+            byte[] sendBytes = { 5, 17, 0, 1, 0, 49, 50, 53, 9, 50, 9 };
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            Check c = null;
+            while (Send(sendBytes))
             {
-                List<string> lStr = Separating();
-                var dt = DateTime.Parse(lStr[1].Remove(16));
-                int zNum = Int32.Parse(lStr[3]); // Номер Z-отчета
-                byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 50, 09 };
-                sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
-                sendBytes = sendBytes.Concat(SEP).ToArray();
-                Check c = null;
-                while (Send(sendBytes))
+                string s = ASCIIEncoding.ASCII.GetString(answer, 8, answerlenght - 9);
+                byte[] buf = Convert.FromBase64String(s); // расшифровонная строка
+                if (buf[0] == 99) // Начало чека
                 {
-                    string s = ASCIIEncoding.ASCII.GetString(answer, 8, answerlenght - 9);
-                    byte[] buf = Convert.FromBase64String(s); // расшифровонная строка
-                    //Console.WriteLine(BitConverter.ToString(buf)+"\n");
-                    
-
-                    if (buf[0] == 99) // Начало чека
+                    if (buf[4] == 0) // Чек
                     {
-                        if (buf[4] == 0) // Чек
-                        {
-                            c = new Check(dt, BitConverter.ToUInt32(buf, 8), zNum);
-                        }
-                        else if (buf[4] == 1) // Возвратный Чек
-                        {
-                            c = new Check(dt, BitConverter.ToUInt32(buf, 8), zNum, true);
-                        }
+                        c = new Check(dt, BitConverter.ToUInt32(buf, 8), zNum);
                     }
-                    else if (buf[0] == 01 && c != null) // Продажа
+                    else if (buf[4] == 1) // Возвратный Чек
                     {
-                        uint code = BitConverter.ToUInt32(buf, 24); // код товара
-
-                        string name = Encoding.Default.GetString(buf, 44, 32); // название товара
-                        name = name.Substring(0, name.IndexOf('\0') > 0 ? name.IndexOf('\0') : 32);
-                        double price = Convert.ToDouble(BitConverter.ToUInt32(buf, 8)) / 100; // цена
-                        double quantity = Convert.ToDouble(BitConverter.ToUInt32(buf, 40)) / 1000; // количество
-                        double sum = Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100; // сумма
-                        c.AddGood(code, price, quantity, sum, name); // добавляем товар в чек
+                        c = new Check(dt, BitConverter.ToUInt32(buf, 8), zNum, true);
                     }
-                    else if (buf[0] == 04) // скидка надбавка
+                }
+                else if (buf[0] == 01 && c != null) // Продажа
+                {
+                    uint code = BitConverter.ToUInt32(buf, 24); // код товара
+
+                    string name = Encoding.Default.GetString(buf, 44, 32); // название товара
+                    name = name.Substring(0, name.IndexOf('\0') > 0 ? name.IndexOf('\0') : 32);
+                    double price = Convert.ToDouble(BitConverter.ToUInt32(buf, 8)) / 100; // цена
+                    double quantity = Convert.ToDouble(BitConverter.ToUInt32(buf, 40)) / 1000; // количество
+                    double sum = Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100; // сумма
+                    c.AddGood(code, price, quantity, sum, name); // добавляем товар в чек
+                }
+                else if (buf[0] == 04) // скидка надбавка
+                {
+                    if (buf[8] == 01) // на Весь Чек
                     {
-                        if (buf[8] == 01) // на Весь Чек
+                        if (buf[6] == 01) // надбавка
                         {
-                            if (buf[6] == 01) // надбавка
-                            {
-                                double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
-                                // надбавка на Весь Чек  
-                                c.discSurc = proc; 
-                            }
-                            else if (buf[6] == 02) // скидка
-                            {
-                                double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
-                                // скидка на Весь Чек
-                                c.discSurc = -proc;
-                            }
+                            double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
+                            // надбавка на Весь Чек  
+                            c.discSurc = proc; 
                         }
-                        else // на товар
+                        else if (buf[6] == 02) // скидка
                         {
-                            if (buf[6] == 01) // надбавка
-                            {
-                                double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
-                                // надбавка на последний товар, на текущий момент.
-                                c.goods.Last<Good>().discSurc = proc;
-                            }
-                            else if (buf[6] == 02) // скидка
-                            {
-                                double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
-
-                                double test = Convert.ToDouble(BitConverter.ToUInt64(buf, 24)) / 100;
-                                // скидка на последний товар, на текущий момент.
-                                c.goods.Last<Good>().discSurc = -proc;
-
-
-                            }
+                            double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
+                            // скидка на Весь Чек
+                            c.discSurc = -proc;
                         }
                     }
-                    else if (buf[0] == 08) // Корекция, Отмена внутри чека
+                    else // на товар
                     {
-                        uint code = BitConverter.ToUInt32(buf, 24); // код товара
-                        string name = Encoding.Default.GetString(buf, 44, 32); // название товара
-                        double price = Convert.ToDouble(BitConverter.ToUInt32(buf, 8)) / 100; // цена
-                        double quantity = Convert.ToDouble(BitConverter.ToUInt32(buf, 40)) / 1000; // количество
-                        double sum = Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100; // сумма
-
-                        if(c.goods.Last().code == code)
+                        if (buf[6] == 01) // надбавка
                         {
-                            c.goods.Last().isVoid = true;     // отменен                   
+                            double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
+                            // надбавка на последний товар, на текущий момент.
+                            c.goods.Last<Good>().discSurc = proc;
                         }
-                        else
+                        else if (buf[6] == 02) // скидка
                         {
-                            foreach(var g in c.goods)
-                            {
-                                if(g.code == code)
-                                {
-                                    g.isVoid = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        //c.AddGood(code, price, -quantity, -sum, name, true);
-                    }
-                    else if (buf[0] == 03) // Оплата
-                    {
-                        byte type = buf[4];
-                        double pay = Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100;
-                        double change = Convert.ToDouble(BitConverter.ToUInt64(buf, 24)) / 100;
-                        c.AddPayment(type, pay, change);
-                    }
-                    else if(buf[0] == 10) // Отмена скидки надбавки на весь чек
-                    {
-                        if (buf[8] == 01) // на Весь Чек
-                        {
-                            if (buf[6] == 01) // надбавка
-                            {
-                                double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
-                                // надбавка на на все товары чека до текущего момента
-                                c.discSurc = 0; // отнимаем надбавку от каждого товара
-                            }
-                            else if (buf[6] == 02) // скидка
-                            {
-                                double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
-                                // скидка на на все товары чека до текущего момента
-                                c.discSurc += proc; // отнимаем скидку от каждого товара
-                            }
-                        }
-                    }
-                    else if(buf[0] == 18)
-                    {
-                        c.isVoidCheck = true;
-                    }
-                    else if(buf[0] == 100)
-                    {  // налоги
-                        double testSum = Convert.ToDouble(BitConverter.ToUInt64(buf, 8)) / 100;
-                        double tax1sum = Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100;
-                        double zbir1sum = Convert.ToDouble(BitConverter.ToUInt64(buf, 24)) / 100;
-                        double checkSum = Convert.ToDouble(BitConverter.ToUInt64(buf, 40)) / 100;
-                        if (c.CheckTax1ZbirSam == 0 && checkSum != 0)
-                        {
-                            c.CheckSum = checkSum;
-                            c.CheckTax1Sam = tax1sum;
-                            c.CheckTax1ZbirSam = zbir1sum;
+                            double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
+                            double test = Convert.ToDouble(BitConverter.ToUInt64(buf, 24)) / 100;
+                            // скидка на последний товар, на текущий момент.
+                            c.goods.Last<Good>().discSurc = -proc;
                         }
                     }
                 }
-                return c; // Возврат Чека
+                else if (buf[0] == 08) // Корекция, Отмена внутри чека
+                {
+                    uint code = BitConverter.ToUInt32(buf, 24); // код товара
+                    string name = Encoding.Default.GetString(buf, 44, 32); // название товара
+                    double price = Convert.ToDouble(BitConverter.ToUInt32(buf, 8)) / 100; // цена
+                    double quantity = Convert.ToDouble(BitConverter.ToUInt32(buf, 40)) / 1000; // количество
+                    double sum = Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100; // сумма
+
+                    if(c.goods.Last().code == code)
+                    {
+                        c.goods.Last().isVoid = true;     // отменен                   
+                    }
+                    else
+                    {
+                        foreach(var g in c.goods)
+                        {
+                            if(g.code == code)
+                            {
+                                g.isVoid = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    //c.AddGood(code, price, -quantity, -sum, name, true);
+                }
+                else if (buf[0] == 03) // Оплата
+                {
+                    byte type = buf[4];
+                    double pay = Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100;
+                    double change = Convert.ToDouble(BitConverter.ToUInt64(buf, 24)) / 100;
+                    c.AddPayment(type, pay, change);
+                }
+                else if(buf[0] == 10) // Отмена скидки надбавки на весь чек
+                {
+                    if (buf[8] == 01) // на Весь Чек
+                    {
+                        if (buf[6] == 01) // надбавка
+                        {
+                            double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
+                            // надбавка на на все товары чека до текущего момента
+                            c.discSurc = 0; // отнимаем надбавку от каждого товара
+                        }
+                        else if (buf[6] == 02) // скидка
+                        {
+                            double proc = Convert.ToDouble(BitConverter.ToUInt64(buf, 104)) / 100;
+                            // скидка на на все товары чека до текущего момента
+                            c.discSurc += proc; // отнимаем скидку от каждого товара
+                        }
+                    }
+                }
+                else if(buf[0] == 18)
+                {
+                    c.isVoidCheck = true;
+                }
+                else if(buf[0] == 100)
+                {  // налоги
+                    double testSum = Convert.ToDouble(BitConverter.ToUInt64(buf, 8)) / 100;
+                    double tax1sum = Convert.ToDouble(BitConverter.ToUInt64(buf, 16)) / 100;
+                    double zbir1sum = Convert.ToDouble(BitConverter.ToUInt64(buf, 24)) / 100;
+                    double checkSum = Convert.ToDouble(BitConverter.ToUInt64(buf, 40)) / 100;
+                    if (c.CheckTax1ZbirSam == 0 && checkSum != 0)
+                    {
+                        c.CheckSum = checkSum;
+                        c.CheckTax1Sam = tax1sum;
+                        c.CheckTax1ZbirSam = zbir1sum;
+                    }
+                }
             }
-            return null;
+            return c; // Возврат Чека
         }
 
         /// <summary>
@@ -573,7 +437,7 @@ namespace Delphin
 
             if (DateTime.MinValue == GetDateDocByDocNum(1)) return null; // нет лицензии
 
-            byte[] sendBytes = { 05, 17, 00, logNum, 00, 49, 50, 53, 09, 49, 09 };
+            byte[] sendBytes = { 5, 17, 0, 1, 00, 49, 50, 53, 9, 49, 9 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             if (Send(sendBytes))
@@ -583,7 +447,93 @@ namespace Delphin
             return null;
         }
 
-#endregion Public methods
+        #endregion Public methods
+
+        #region Private Field
+
+
+        internal TcpClient client = null;
+        private NetworkStream tcpStream = null;
+        private byte[] SEP = { 9 };
+        private byte[] answer = new byte[256];
+        private int answerlenght = 0;
+
+
+        #endregion Private Field
+
+        /// <summary>
+        /// Метод отправляет массив байт и обрабатывает ответ.
+        /// </summary>
+        /// <param name="sendBytes"> Массив байт для отправки.</param>
+        /// <returns></returns>
+        private bool Send(byte[] sendBytes)
+        {
+            if (!client.Connected) return false;
+            byte[] leng = { Convert.ToByte(sendBytes.Length) };
+            sendBytes = leng.Concat(sendBytes).ToArray();
+            tcpStream.Write(sendBytes, 0, sendBytes.Length);
+            byte[] bytes = new byte[client.ReceiveBufferSize];
+            int bytesRead = tcpStream.Read(bytes, 0, client.ReceiveBufferSize);
+            if (bytesRead == 0) return false;
+            if (bytes[6] != 48) return false;
+            answer = bytes;
+            answerlenght = bytesRead;
+            return true;
+                   
+        }
+
+        /// <summary>
+        /// Преабразует массив byte находящийся в переменной ansfer - массив строк
+        /// </summary>
+        /// <returns>Массив строк.</returns>
+        private List<string> Separating()
+        {
+            List<string> lStr = new List<string>();
+            String temp = String.Empty;
+            for (int i = 8; i < answerlenght; i++) // перебор массива ответа
+            {
+                if (answer[i] != 09) // не встретили сепаратор
+                {
+                    temp += ASCIIEncoding.Default.GetString(answer, i, 1);
+                }
+                else // втретили сепаратор - значит конец строки. 
+                {
+                    lStr.Add(temp);
+                    temp = String.Empty;
+                }
+            }
+            return lStr;
+        }
+
+        /// <summary>
+        /// задает документ для чтения
+        /// </summary>
+        /// <param name="docNumber"></param>
+        /// <returns>bool</returns>
+        private bool SetDocForRead(int docNumber)
+        {// 125 | 1 | docNum
+            byte[] sendBytes = { 5, 17, 0, 1, 0, 49, 50, 53, 9, 48, 9 };
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            if (!Send(sendBytes)) return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Возвращает дату документа с заданным номером.
+        /// </summary>
+        /// <param name="docNumber">Номер документа.</param>
+        /// <returns>DateTime - Дата документа.</returns>
+        public DateTime GetDateDocByDocNum(int docNumber)
+        {
+            byte[] sendBytes = { 5, 17, 0, 1, 0, 49, 50, 53, 9, 48, 9 };
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(docNumber.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            if (!Send(sendBytes)) return DateTime.MinValue;
+            List<string> lStr = Separating();
+            var dt = DateTime.Parse(lStr[1].Remove(16));
+            return dt;
+        }
 
     } // class ECR
 } // namespace DP_25_ole

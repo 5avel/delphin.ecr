@@ -74,16 +74,16 @@ namespace ConsoleApplication1
 
 
 
-            Console.WriteLine(ecr1c.Connect("192.168.0.53", 5999, 1));
+            Console.WriteLine(ecr1c.Connect("192.168.88.57", 5999, 1));
             // Console.WriteLine(ecr1c.GetDataTime());
 
-            ecr1c.Beep(1555, 5000);
+            ecr1c.Beep(1555, 1000);
 
             //ecr1c.DataSalesFrom = "01-12-15";
             //ecr1c.DataSalesTo = "15-12-15";
             //while (ecr1c.GetCheck())
             //{ 
-            
+
             //}
             //List<string> list = ecr1c.SearchReceipt("25-07-15 00:00:00 DST", "25-07-15 23:00:00 DST");
 
@@ -91,14 +91,14 @@ namespace ConsoleApplication1
             //Console.WriteLine(list[1]);          
             //Console.WriteLine(list[2]);          
             //Console.WriteLine(list[3]);          
-                                                   
-                                                   
+
+
 
             //mils = mils - DateTime.Now.Millisecond;
 
             //Console.WriteLine(mils);
 
-            //ecr1c.DataSales = "22-05-15";
+            //ecr1c.DataSales = "11-10-21";
             //while (ecr1c.GetCheck())
             //{
             //    Console.WriteLine("\n Чек - " + ecr1c.JCheckNum + "  Дата - " + ecr1c.JCheckDate + "\n  Скидка на чек " + ecr1c.JCheckDis + "%" + " Возврат - " + ecr1c.JCheckIsReturn + " Отменен -" + ecr1c.JCheckIsVoid + " Z -" + ecr1c.JCheckNumZRep);
@@ -119,8 +119,8 @@ namespace ConsoleApplication1
             //}
 
 
-            //ecr1c.DataSalesFrom = "22-02-18";
-            //ecr1c.DataSalesTo = "22-02-18";
+            //ecr1c.DataSalesFrom = "11-10-21";
+            //ecr1c.DataSalesTo = "11-10-21";
             //while (ecr1c.GetCheck())
             //{
             //    Console.WriteLine("\n Чек - " + ecr1c.JCheckNum + "  Дата - " + ecr1c.JCheckDate + "\n  Скидка на чек " + ecr1c.JCheckDis + "%" + " Возврат - " + ecr1c.JCheckIsReturn + " Отменен -" + ecr1c.JCheckIsVoid + " Z -" + ecr1c.JCheckNumZRep);
@@ -142,7 +142,8 @@ namespace ConsoleApplication1
             //}
 
 
-
+            ecr1c.ReadArticul(1);
+            Console.WriteLine(ecr1c.ArtCode + "\t|  " + ecr1c.ArtTax + "\t|  " + ecr1c.ArtQnty + "\t|  " + ecr1c.ArtPrice + "\t|  " + ecr1c.ArtName);
 
 
 

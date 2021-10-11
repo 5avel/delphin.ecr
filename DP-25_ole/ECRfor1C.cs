@@ -12,7 +12,7 @@ namespace Delphin
 
         public bool Connect(string ip, int port, byte logNum)
         {
-            return ecr.Connect(ip, port, logNum);
+            return ecr.Connect(ip, port);
         }
 
         public bool Disconnect()
@@ -63,7 +63,7 @@ namespace Delphin
                 ArtDep = art.Dep;
                 ArtGrp = art.Group;
                 ArtTax = art.TaxGr;
-                ArtBarCode = art.Bar1;
+                ArtBarCode = art.BarX;
                 ArtSaleQnty = art.SoldQty;
                 ArtSaleSum = art.Turnover;
                 return true;
@@ -99,10 +99,10 @@ namespace Delphin
         /// <returns>Возвращаемое значение: логического типа, ИСТИНА, если функция выполнена успешно, ЛОЖЬ – если возникла ошибка. 
         /// Возвращаемое значение можно также прочитать функцией GetLastError, которая возвращает результат выполнения последней 
         /// функции (0-успешно, 1-ошибка).</returns>
-        public bool WriteArticul(int Code, string Name, double Price, double Qnty, byte Dep, byte Grp, byte Tax, string BarCode)
-        {
-            return ecr.WritePlu(Code, Tax, Dep, Grp, 0, Price, 0, Qnty, BarCode, "", "", "", Name, 0);
-        }
+        //public bool WriteArticul(int Code, string Name, double Price, double Qnty, byte Dep, byte Grp, byte Tax, string BarCode)
+        //{
+        //    return ecr.WritePlu(Code, Tax, Dep, Grp, 0, Price, 0, Qnty, BarCode, "", "", "", Name, 0);
+        //}
 
         /// <summary>
         ///  Назначение:  Функция предназначена для удаления артикула запрограммированного в кассовый аппарат. 
@@ -236,6 +236,7 @@ namespace Delphin
             {
                 if (DataSalesTo == null) DataSalesTo = DataSalesFrom;
                 int num = ecr.GetFirstDocNumberByDate(DataSalesFrom, DataSalesTo); // Получаем номер первого документа на дату
+                Console.WriteLine($"FirstDocNumber = {num}");
                 if (num > 0) // если он больше нуля то устанавливаем его для чтения
                 {
                     CurentCheckNum = num;

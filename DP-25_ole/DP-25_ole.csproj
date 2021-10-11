@@ -52,7 +52,6 @@
   <ItemGroup>
     <Compile Include="ECR.cs" />
     <Compile Include="ECRfor1C.cs" />
-    <Compile Include="ECRPrivat.cs" />
     <Compile Include="IECR.cs" />
     <Compile Include="IEvents.cs" />
     <Compile Include="PLU.cs" />

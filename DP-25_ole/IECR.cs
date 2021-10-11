@@ -10,14 +10,14 @@ namespace Delphin
         [DispId(1)]
 
         // описываем методы которые можно будет вызывать из вне
-        bool Connect(string ip, int port, byte logNum);
+        bool Connect(string ip, int port);
         bool Disconnect();
         bool Beep(int tone, int len);
         PLU ReadPlu(int pluCode);
         bool DeletingPlu(int firstPlu, int lastPlu);
 
-        bool WritePlu(int plu, byte taxGr, byte dep, byte group, byte priceType, double price, double addQty, double quantity,
-                                string bar1, string bar2, string bar3, string bar4, string name, int connectedPLU);
+        bool WritePlu(int plu, byte taxGr, byte dep, byte group, byte priceType, double price, double addQty,
+                                double quantity, string barX, string name, int fractionalQty, string customCode);
 
         string GetDataTime();
         bool SetDataTime(string dataTime);
