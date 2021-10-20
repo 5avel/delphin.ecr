@@ -16,8 +16,11 @@ namespace Delphin
         PLU ReadPlu(int pluCode);
         bool DeletingPlu(int firstPlu, int lastPlu);
 
-        bool WritePlu(int plu, byte taxGr, byte dep, byte group, byte priceType, double price, double addQty,
+        bool WritePlu(int plu, byte taxGr, byte dep, byte group, byte priceType, string price, double addQty,
                                 double quantity, string barX, string name, int fractionalQty, string customCode);
+
+       
+
 
         string GetDataTime();
         bool SetDataTime(string dataTime);

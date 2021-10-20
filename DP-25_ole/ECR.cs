@@ -134,14 +134,13 @@ namespace Delphin
             return DeletingPlu(pluCode, pluCode);
         }
 
-        public bool WritePlu(   int plu, byte taxGr, byte dep, byte group, byte priceType, double price, double addQty,
+        public bool WritePlu(   int plu, byte taxGr, byte dep, byte group, byte priceType, string price, double addQty,
                                 double quantity, string barX, string name, int fractionalQty, string customCode)
         {
             if (client.Connected == false) return false; // состояние соединенияя
 
-            if (DateTime.MinValue == GetDateDocByDocNum(1)) return false; // нет лицензии
-
-                                                                       // P
+                                                                       //107 = 49 48 55
+                                                                       // 80 = P
                                                        //31h 30h 37h 09h 50h 09h  
             byte[] sendBytes = { 5, 17, 0, 1, 0, 49, 48, 55, 9, 80, 9 };
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(plu.ToString())).ToArray();
@@ -158,20 +157,55 @@ namespace Delphin
             sendBytes = sendBytes.Concat(SEP).ToArray();
             if (addQty < 0)
             {
-                sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(addQty.ToString().Replace(',', '.'))).ToArray();
+                sendBytes = sendBytes.Concat(Encoding.Default.GetBytes($"{addQty}.00".ToString().Replace(',', '.'))).ToArray();
             }
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(quantity.ToString().Replace(',', '.'))).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
+
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(barX.ToString())).ToArray();
-            sendBytes = sendBytes.Concat(SEP).ToArray(); 
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes("0".ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes("0".ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes("0".ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(name.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(fractionalQty.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
             sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(customCode.ToString())).ToArray();
             sendBytes = sendBytes.Concat(SEP).ToArray();
-           
+            sendBytes = sendBytes.Concat(Encoding.Default.GetBytes(0.ToString())).ToArray();
+            sendBytes = sendBytes.Concat(SEP).ToArray();
+
+
+
+
+
+
+            Console.WriteLine();
+
+            List<string> lStr = new List<string>();
+            String temp = String.Empty;
+            for (int i = 11; i < sendBytes.Length; i++) // перебор массива ответа
+            {
+                Console.Write($"{ASCIIEncoding.Default.GetString(sendBytes, i, 1)}");
+                if (sendBytes[i] != 09) // не встретили сепаратор
+                {
+                    temp += ASCIIEncoding.Default.GetString(sendBytes, i, 1);
+                }
+                else // втретили сепаратор - значит конец строки. 
+                {
+                    lStr.Add(temp);
+                    temp = String.Empty;
+                }
+            }
+
+
+
+
             if (Send(sendBytes))
             {
                 return true;
@@ -488,10 +522,13 @@ namespace Delphin
         /// <returns>Массив строк.</returns>
         private List<string> Separating()
         {
+            Console.WriteLine();
+
             List<string> lStr = new List<string>();
             String temp = String.Empty;
             for (int i = 8; i < answerlenght; i++) // перебор массива ответа
             {
+                Console.Write($"{ASCIIEncoding.Default.GetString(answer, i, 1)}");
                 if (answer[i] != 09) // не встретили сепаратор
                 {
                     temp += ASCIIEncoding.Default.GetString(answer, i, 1);

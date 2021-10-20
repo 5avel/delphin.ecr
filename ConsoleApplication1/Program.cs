@@ -141,13 +141,16 @@ namespace ConsoleApplication1
 
             //}
 
-
+            bool res = ecr1c.WriteArticul(1, "Напиток с/а Icelife Экстрим ж/б 0,5 л", "200", 0, 1, 1, 1, "4820000194693", "");
             ecr1c.ReadArticul(1);
-            Console.WriteLine(ecr1c.ArtCode + "\t|  " + ecr1c.ArtTax + "\t|  " + ecr1c.ArtQnty + "\t|  " + ecr1c.ArtPrice + "\t|  " + ecr1c.ArtName);
+            //Console.WriteLine(ecr1c.ArtCode + "\t|  " + ecr1c.ArtTax + "\t|  " + ecr1c.ArtQnty + "\t|  " + ecr1c.ArtPrice + "\t|  " + ecr1c.ArtName + "\t|  " + ecr1c.ArtCustomCode);
 
+            
 
-
-
+            ecr1c.ReadArticul(2);
+            //Console.WriteLine(ecr1c.ArtCode + "\t|  " + ecr1c.ArtTax + "\t|  " + ecr1c.ArtQnty + "\t|  " + ecr1c.ArtPrice + "\t|  " + ecr1c.ArtName + "\t|  " + ecr1c.ArtCustomCode);
+            ecr1c.ReadArticul(3);
+            ecr1c.ReadArticul(4);
             Console.WriteLine(ecr1c.Disconnect());
 
             //}

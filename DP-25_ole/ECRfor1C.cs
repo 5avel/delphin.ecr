@@ -21,9 +21,9 @@ namespace Delphin
         }
 
 
-        public int ArtCode { private set; get; }
-        public string ArtName { private set; get; }
-        public double ArtPrice { private set; get; }
+        public int ArtCode { private set; get; } //+
+        public string ArtName { private set; get; } //+
+        public double ArtPrice { private set; get; } //+
         public double ArtQnty { private set; get; }
         public byte ArtDep { private set; get; }
         public byte ArtGrp { private set; get; }
@@ -31,6 +31,8 @@ namespace Delphin
         public string ArtBarCode { private set; get; }
         public double ArtSaleQnty { private set; get; }
         public double ArtSaleSum { private set; get; }
+        public int ArtFractionalQty { private set; get; }
+        public string ArtCustomCode { private set; get; }
         /// <summary>
         /// Назначение:  Функция предназначена для чтения артикула и данных о продажах по нему из РРО. 
         /// После успешного выполнения данной функции становятся доступны свойства, в которых записана 
@@ -101,8 +103,13 @@ namespace Delphin
         /// функции (0-успешно, 1-ошибка).</returns>
         //public bool WriteArticul(int Code, string Name, double Price, double Qnty, byte Dep, byte Grp, byte Tax, string BarCode)
         //{
-        //    return ecr.WritePlu(Code, Tax, Dep, Grp, 0, Price, 0, Qnty, BarCode, "", "", "", Name, 0);
+        //    return ecr.WritePlu(Code, Tax, Dep, Grp, 0, Price, 0, Qnty, BarCode, Name, 0, "");
         //}
+
+        public bool WriteArticul(int Code, string Name, string Price, double Qnty, byte Dep, byte Grp, byte Tax, string BarCode, string CustomCode)
+        {
+            return ecr.WritePlu(Code, Tax, Dep, Grp, 1, Price, 0, Qnty, BarCode, Name, 0, CustomCode);
+        }
 
         /// <summary>
         ///  Назначение:  Функция предназначена для удаления артикула запрограммированного в кассовый аппарат. 

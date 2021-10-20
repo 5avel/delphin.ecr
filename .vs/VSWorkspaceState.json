@@ -2,8 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\ConsoleApplication1",
-    "\\DP-25_ole"
+    "\\DP-25_ole",
+    "\\TestConnect"
   ],
-  "SelectedNode": "\\ConsoleApplication1\\Program.cs",
+  "SelectedNode": "\\DP-25_ole\\ECR.cs",
   "PreviewInSolutionExplorer": false
 }
