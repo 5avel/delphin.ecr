@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31321.278
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.csproj", "{CCC98313-E7A7-4FB7-B861-DF6130019FD0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DP-25_ole", "DP-25_ole\DP-25_ole.csproj", "{A430CC3A-0094-4680-89D2-63A94B2ED453}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestConnect", "TestConnect\TestConnect.csproj", "{E5573893-2B62-4692-A6BD-826CBACE5168}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DPx5 PLU Editor", "DPx5 PLU Editor\DPx5 PLU Editor.csproj", "{70693D29-EFEF-41DF-B7A8-B03B4B6A029C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,6 +50,16 @@ Global
 		{E5573893-2B62-4692-A6BD-826CBACE5168}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E5573893-2B62-4692-A6BD-826CBACE5168}.SingleImage|Any CPU.ActiveCfg = Debug|Any CPU
 		{E5573893-2B62-4692-A6BD-826CBACE5168}.SingleImage|Any CPU.Build.0 = Debug|Any CPU
+		{70693D29-EFEF-41DF-B7A8-B03B4B6A029C}.CD_ROM|Any CPU.ActiveCfg = Debug|Any CPU
+		{70693D29-EFEF-41DF-B7A8-B03B4B6A029C}.CD_ROM|Any CPU.Build.0 = Debug|Any CPU
+		{70693D29-EFEF-41DF-B7A8-B03B4B6A029C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70693D29-EFEF-41DF-B7A8-B03B4B6A029C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70693D29-EFEF-41DF-B7A8-B03B4B6A029C}.DVD-5|Any CPU.ActiveCfg = Debug|Any CPU
+		{70693D29-EFEF-41DF-B7A8-B03B4B6A029C}.DVD-5|Any CPU.Build.0 = Debug|Any CPU
+		{70693D29-EFEF-41DF-B7A8-B03B4B6A029C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70693D29-EFEF-41DF-B7A8-B03B4B6A029C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70693D29-EFEF-41DF-B7A8-B03B4B6A029C}.SingleImage|Any CPU.ActiveCfg = Debug|Any CPU
+		{70693D29-EFEF-41DF-B7A8-B03B4B6A029C}.SingleImage|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
